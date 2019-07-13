@@ -9,9 +9,6 @@ RSpec.describe AnswersController, type: :controller do
     it 'should render new template' do
       expect(response).to render_template :new
     end
-    it 'should assign answer to question' do
-      expect(assigns(:answer).question).to eq question
-    end
   end
 
   describe 'POST #create' do
@@ -20,12 +17,8 @@ RSpec.describe AnswersController, type: :controller do
         post :create, params: { question_id: question.id, answer: attributes_for(:answer) }
       end
 
-      it 'should create new answer' do
-        expect { post_answer }.to change { Answer.count }.by(1)
-      end
-      it 'should assign answer to question' do
-        post_answer
-        expect(assigns(:answer).question).to eq question
+      it 'should create new answer for question' do
+        expect { post_answer }.to change { question.answers.count }.by(1)
       end
       it 'should redirect to question' do
         post_answer

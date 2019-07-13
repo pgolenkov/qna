@@ -19,7 +19,7 @@ RSpec.describe QuestionsController, type: :controller do
       end
       it 'should redirect to created question' do
         post_question
-        expect(response).to redirect_to assigns(:question)
+        expect(response).to redirect_to Question.last
       end
     end
 
@@ -38,9 +38,6 @@ RSpec.describe QuestionsController, type: :controller do
     let(:question) { create :question }
     before { get :show, params: { id: question } }
 
-    it 'should assigns question' do
-      expect(assigns(:question)).to eq question
-    end
     it 'should render show' do
       expect(response).to render_template :show
     end
