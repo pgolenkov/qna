@@ -19,5 +19,12 @@ feature 'User can create question', %q{
     expect(page).to have_content 'Text of question'
   end
 
-  scenario 'User asks a question with errors'
+  scenario 'User asks a question with errors' do
+    visit questions_path
+    click_on 'Ask question'
+
+    click_on 'Ask'
+
+    expect(page).to have_content "Title can't be blank"
+  end
 end
