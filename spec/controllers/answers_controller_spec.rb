@@ -3,14 +3,6 @@ require 'rails_helper'
 RSpec.describe AnswersController, type: :controller do
   let(:question) { create :question }
 
-  describe 'GET #new' do
-    before { get :new, params: { question_id: question.id } }
-
-    it 'should render new template' do
-      expect(response).to render_template :new
-    end
-  end
-
   describe 'POST #create' do
     context 'with valid params' do
       def post_answer
@@ -34,9 +26,9 @@ RSpec.describe AnswersController, type: :controller do
         expect { post_invalid_answer }.not_to change { Answer.count }
       end
 
-      it 'should render new template' do
+      it 'should render question show template' do
         post_invalid_answer
-        expect(response).to render_template :new
+        expect(response).to render_template 'questions/show'
       end
     end
   end

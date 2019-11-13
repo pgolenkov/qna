@@ -18,4 +18,9 @@ class QuestionsController < ApplicationController
   def question_params
     params.require(:question).permit(:title, :body)
   end
+
+  def answer
+    @answer ||= question.answers.build
+  end
+  helper_method :answer
 end
