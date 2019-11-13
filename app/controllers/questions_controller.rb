@@ -2,9 +2,6 @@ class QuestionsController < ApplicationController
   expose :questions, ->{ Question.all }
   expose :question
 
-  def index
-  end
-
   def create
     if question.save
       redirect_to question, notice: 'Your question successfully created!'
