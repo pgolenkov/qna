@@ -9,22 +9,35 @@ feature 'User can create answer for question', %q{
   given!(:questions) { 3.times.map { create :question } }
   given(:question) { questions.first }
 
-  background do
+  describe 'Authenticated user' do
+    given(:user) { create :user }
+
+    background do
+      login(user)
+      visit question_path(question)
+    end
+
+    scenario 'adds an answer for the selected question' do
+      fill_in 'Body', with: 'Text of answer'
+      click_on 'Add answer'
+
+      expect(page).to have_content 'Your answer successfully created!'
+      expect(page).to have_content 'Text of answer'
+      expect(page).to have_content question.body
+    end
+
+    scenario 'adds an answer for the selected question with errors' do
+      click_on 'Add answer'
+
+      expect(page).to have_content "Body can't be blank"
+    end
+  end
+
+  scenario 'Unauthenticated user tries add an answer' do
     visit question_path(question)
-  end
-
-  scenario 'User add an answer for the selected question' do
-    fill_in 'Body', with: 'Text of answer'
     click_on 'Add answer'
 
-    expect(page).to have_content 'Your answer successfully created!'
-    expect(page).to have_content 'Text of answer'
-    expect(page).to have_content question.body
+    expect(page).to have_content 'You need to sign in or sign up before continuing.'
   end
 
-  scenario 'User add an answer for the selected question with errors' do
-    click_on 'Add answer'
-
-    expect(page).to have_content "Body can't be blank"
-  end
 end

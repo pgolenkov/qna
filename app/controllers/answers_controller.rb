@@ -1,4 +1,6 @@
 class AnswersController < ApplicationController
+  before_action :authenticate_user!, except: [:index, :show]
+
   expose :question, id: :question_id
   expose :answer, parent: :question
 
