@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe QuestionsController, type: :controller do
+  let(:user) { create :user }
+
   describe 'GET #index' do
     it 'should render index view' do
       get :index
@@ -9,6 +11,8 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'GET #new' do
+    before { login(user) }
+
     it 'should render new view' do
       get :new
       expect(response).to render_template :new
@@ -16,6 +20,8 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'POST #create' do
+    before { login(user) }
+
     context 'with valid params' do
       def post_question
         post :create, params: { question: attributes_for(:question) }
