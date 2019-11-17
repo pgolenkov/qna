@@ -30,6 +30,10 @@ RSpec.describe QuestionsController, type: :controller do
       it 'should create new question' do
         expect { post_question }.to change { Question.count }.by(1)
       end
+      it 'should set questions user attribute to current user' do
+        post_question
+        expect(Question.last.user).to eq user
+      end
       it 'should redirect to created question' do
         post_question
         expect(response).to redirect_to Question.last
@@ -48,11 +52,26 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'GET #show' do
-    let(:question) { create :question }
+    let(:question) { create :question, user: user }
     before { get :show, params: { id: question } }
 
     it 'should render show' do
       expect(response).to render_template :show
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    let(:question) { create :question, user: user }
+
+    before { login(user) }
+    before { delete :destroy, params: { id: question } }
+
+    it 'should destroy question' do
+      expect(Question.all).not_to include(question)
+    end
+
+    it 'should redirect to questions_path' do
+      expect(response).to redirect_to questions_path
     end
   end
 

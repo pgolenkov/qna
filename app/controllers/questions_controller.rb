@@ -2,7 +2,7 @@ class QuestionsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
 
   expose :questions, ->{ Question.all }
-  expose :question
+  expose :question, build: ->(params, scope){ current_user.questions.build(params) }
 
   def create
     if question.save
@@ -10,6 +10,11 @@ class QuestionsController < ApplicationController
     else
       render :new
     end
+  end
+
+  def destroy
+    question.destroy
+    redirect_to questions_path, notice: 'Your question successfully destroyed.'
   end
 
   private

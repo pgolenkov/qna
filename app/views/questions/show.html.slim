@@ -9,3 +9,5 @@ p= question.body
   = f.label :body
   = f.text_area :body
   = f.submit 'Add answer'
+
+= link_to 'Delete question', question, method: :delete
