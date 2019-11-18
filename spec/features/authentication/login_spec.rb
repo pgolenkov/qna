@@ -24,4 +24,13 @@ feature 'User can sign in',%q{
     expect(page).to have_content 'Invalid Email or password.'
   end
 
+  scenario 'Registered user try to sign in with invalid password' do
+    visit new_user_session_path
+    fill_in 'Email', with: user.email
+    fill_in 'Password', with: 'wrong_password'
+
+    click_on 'Log in'
+
+    expect(page).to have_content 'Invalid Email or password.'
+  end
 end

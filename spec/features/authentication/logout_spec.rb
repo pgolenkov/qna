@@ -16,6 +16,6 @@ feature 'User can log out',%q{
 
   scenario 'Unathenticated user try to log out' do
     visit root_path
-    expect(page).not_to have_content 'Log out'
+    expect(page).to have_no_link 'Log out'
   end
 end
