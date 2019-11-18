@@ -15,6 +15,8 @@ feature 'User can destroy his answer', %q{
     login(user)
     visit question_path(question)
 
+    expect(page).to have_content(answer.body)
+
     within("#answer-#{answer.id}") do
       click_on 'Delete answer'
     end
@@ -27,12 +29,12 @@ feature 'User can destroy his answer', %q{
     login(user)
     visit question_path(question)
 
-    expect(page.find("#answer-#{another_answer.id}")).not_to have_content('Delete answer')
+    expect(page.find("#answer-#{another_answer.id}")).to have_no_link('Delete answer')
   end
 
   scenario 'Unauthenticated user don`t see link to destroy answer' do
     visit question_path(question)
 
-    expect(page).not_to have_content('Delete answer')
+    expect(page).to have_no_link('Delete answer')
   end
 end
