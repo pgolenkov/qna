@@ -5,46 +5,33 @@ RSpec.describe AnswersController, type: :controller do
   let(:user) { create :user }
 
   describe 'POST #create' do
-    def post_answer
-      post :create, params: { question_id: question.id, answer: attributes_for(:answer) }
-    end
+    subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer) }}
 
     describe 'by authenticated user' do
       before { login(user) }
 
       context 'with valid params' do
         it 'should create new answer for question' do
-          expect { post_answer }.to change { question.answers.count }.by(1)
+          expect { subject }.to change { question.answers.count }.by(1)
         end
-        it 'should redirect to question' do
-          post_answer
-          expect(response).to redirect_to question
-        end
+        it { should redirect_to(question) }
       end
       context 'with invalid params' do
-        def post_invalid_answer
-          post :create, params: { question_id: question.id, answer: attributes_for(:answer, :invalid) }
-        end
+        subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer, :invalid) } }
 
         it 'should not create new answer' do
-          expect { post_invalid_answer }.not_to change { Answer.count }
+          expect { subject }.not_to change { Answer.count }
         end
 
-        it 'should render question show template' do
-          post_invalid_answer
-          expect(response).to render_template 'questions/show'
-        end
+        it { should render_template('questions/show') }
       end
     end
 
     describe 'by unauthenticated user' do
       it 'should not create new answer' do
-        expect { post_answer }.not_to change { Answer.count }
+        expect { subject }.not_to change { Answer.count }
       end
-      it 'should redirect to new user session path' do
-        post_answer
-        expect(response).to redirect_to new_user_session_path
-      end
+      it { should redirect_to(new_user_session_path) }
     end
   end
 
@@ -53,48 +40,38 @@ RSpec.describe AnswersController, type: :controller do
     let!(:answer) { create :answer, question: question, user: user }
     let!(:another_answer) { create :answer, question: question }
 
-    def destroy_answer(answer)
-      delete :destroy, params: { question_id: answer.question, id: answer }
-    end
+    subject { delete :destroy, params: { question_id: answer.question, id: answer } }
 
     describe 'by authenticated user' do
       before { login(user) }
 
       describe 'for own answer' do
-        before { destroy_answer(answer) }
-
+        before { subject }
         it 'should destroy answer' do
           expect(Answer).not_to exist(answer.id)
         end
 
-        it 'should redirect to question_path' do
-          expect(response).to redirect_to question_path(question)
-        end
+        it { should redirect_to(question_path(question)) }
       end
 
       describe 'for another`s answer' do
-        before { destroy_answer(another_answer) }
-
+        subject { delete :destroy, params: { question_id: another_answer.question, id: another_answer } }
+        before { subject }
         it 'should not delete answer' do
           expect(Answer).to exist(another_answer.id)
         end
 
-        it 'should redirect to question_path' do
-          expect(response).to redirect_to question_path(question)
-        end
+        it { should redirect_to(question_path(question)) }
       end
     end
 
     describe 'by unauthenticated user' do
-      before { destroy_answer(answer) }
-
+      before { subject }
       it 'should not delete any answer' do
         expect(Answer).to exist(answer.id)
       end
 
-      it 'should redirect to new user session path' do
-        expect(response).to redirect_to new_user_session_path
-      end
+      it { should redirect_to(new_user_session_path) }
     end
   end
 
