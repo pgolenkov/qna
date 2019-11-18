@@ -64,7 +64,7 @@ RSpec.describe AnswersController, type: :controller do
         before { destroy_answer(answer) }
 
         it 'should destroy answer' do
-          expect(Answer.all).not_to include(answer)
+          expect(Answer).not_to exist(answer.id)
         end
 
         it 'should redirect to question_path' do
@@ -76,7 +76,7 @@ RSpec.describe AnswersController, type: :controller do
         before { destroy_answer(another_answer) }
 
         it 'should not delete answer' do
-          expect(Answer.all).to include(another_answer)
+          expect(Answer).to exist(another_answer.id)
         end
 
         it 'should redirect to question_path' do
@@ -89,7 +89,7 @@ RSpec.describe AnswersController, type: :controller do
       before { destroy_answer(answer) }
 
       it 'should not delete any answer' do
-        expect(Answer.all).to include(answer)
+        expect(Answer).to exist(answer.id)
       end
 
       it 'should redirect to new user session path' do

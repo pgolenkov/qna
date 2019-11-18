@@ -83,7 +83,7 @@ RSpec.describe QuestionsController, type: :controller do
         before { delete :destroy, params: { id: question } }
 
         it 'should destroy question' do
-          expect(Question.all).not_to include(question)
+          expect(Question).not_to exist(question.id)
         end
 
         it 'should redirect to questions_path' do
@@ -95,7 +95,7 @@ RSpec.describe QuestionsController, type: :controller do
         before { delete :destroy, params: { id: another_question } }
 
         it 'should not delete another question' do
-          expect(Question.all).to include(another_question)
+          expect(Question).to exist(another_question.id)
         end
 
         it 'should redirect to questions_path' do
@@ -108,7 +108,7 @@ RSpec.describe QuestionsController, type: :controller do
       before { delete :destroy, params: { id: question } }
 
       it 'should not delete any question' do
-        expect(Question.all).to include(question)
+        expect(Question).to exist(question.id)
       end
 
       it 'should redirect to new user session path' do
