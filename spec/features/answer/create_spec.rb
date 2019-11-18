@@ -6,7 +6,7 @@ feature 'User can create answer for question', %q{
   I'd like to be able to create an answer for question
 } do
 
-  given!(:questions) { 3.times.map { create :question } }
+  given!(:questions) { create_list :question, 2 }
   given(:question) { questions.first }
 
   describe 'Authenticated user' do

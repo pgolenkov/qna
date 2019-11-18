@@ -6,7 +6,7 @@ feature 'User can view questions list', %q{
   I'd like to be able to view questions list
 } do
 
-  given!(:questions) { 3.times.map { create :question } }
+  given!(:questions) { create_list :question, 2 }
 
   scenario 'User view titles of questions on index page' do
     visit questions_path

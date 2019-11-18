@@ -6,8 +6,9 @@ feature 'User can view question page', %q{
   I'd like to be able to open page for question
 } do
 
-  given!(:questions) { 3.times.map { create :question } }
+  given!(:questions) { create_list :question, 2 }
   given(:question) { questions.first }
+  given!(:answers) { create_list :answer, 2, question: question }
 
   scenario 'User opens question page from index page' do
     visit questions_path
@@ -18,7 +19,6 @@ feature 'User can view question page', %q{
   end
 
   scenario 'User sees answers for question on question page' do
-    answers = 3.times.map { create :answer, question: question }
     visit question_path(question)
 
     answers.each { |answer| expect(page).to have_content answer.body }
