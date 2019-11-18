@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :answer do
-    body { "MyText" }
+    user
+    sequence(:body) { |n| "My Answer #{n}" }
 
     trait :invalid do
       body { nil }

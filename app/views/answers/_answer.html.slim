@@ -1,2 +1,4 @@
-div
+div id="answer-#{answer.id}"
   = answer.body
+  - if current_user && current_user.answers.include?(answer)
+    = link_to 'Delete answer', [question, answer], method: :delete

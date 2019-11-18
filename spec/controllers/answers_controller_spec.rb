@@ -36,4 +36,42 @@ RSpec.describe AnswersController, type: :controller do
     end
   end
 
+  describe 'DELETE #destroy' do
+    let(:question) { create :question }
+    let(:answer) { create :answer, question: question, user: user }
+    let(:another_answer) { create :answer, question: question }
+
+    def destroy_answer(answer)
+      delete :destroy, params: { question_id: answer.question, id: answer }
+    end
+
+    describe 'by authenticated user' do
+      before { login(user) }
+
+      describe 'should delete own answer' do
+        before { destroy_answer(answer) }
+
+        it 'should destroy answer' do
+          expect(Answer.all).not_to include(answer)
+        end
+
+        it 'should redirect to question_path' do
+          expect(response).to redirect_to question_path(question)
+        end
+      end
+
+      it 'should not delete another`s answer' do
+        destroy_answer(another_answer)
+
+        expect(Answer.all).to include(another_answer)
+      end
+    end
+
+    it 'by unauthenticated user should not delete any answer' do
+      destroy_answer(answer)
+
+      expect(Answer.all).to include(answer)
+    end
+  end
+
 end
