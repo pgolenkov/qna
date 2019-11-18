@@ -20,33 +20,45 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'POST #create' do
-    before { login(user) }
+    def post_question
+      post :create, params: { question: attributes_for(:question) }
+    end
 
-    context 'with valid params' do
-      def post_question
-        post :create, params: { question: attributes_for(:question) }
+    describe 'by authenticated user' do
+      before { login(user) }
+
+      context 'with valid params' do
+        it 'should create new question' do
+          expect { post_question }.to change { Question.count }.by(1)
+        end
+        it 'should set questions user attribute to current user' do
+          post_question
+          expect(Question.last.user).to eq user
+        end
+        it 'should redirect to created question' do
+          post_question
+          expect(response).to redirect_to Question.last
+        end
       end
 
-      it 'should create new question' do
-        expect { post_question }.to change { Question.count }.by(1)
-      end
-      it 'should set questions user attribute to current user' do
-        post_question
-        expect(Question.last.user).to eq user
-      end
-      it 'should redirect to created question' do
-        post_question
-        expect(response).to redirect_to Question.last
+      context 'with invalid params' do
+        it 'should not create new question' do
+          expect { post :create, params: { question: attributes_for(:question, :invalid) } }.not_to change { Question.count }
+        end
+        it 'should render new view' do
+          post :create, params: { question: attributes_for(:question, :invalid) }
+          expect(response).to render_template :new
+        end
       end
     end
 
-    context 'with invalid params' do
+    describe 'by unauthenticated user' do
       it 'should not create new question' do
-        expect { post :create, params: { question: attributes_for(:question, :invalid) } }.not_to change { Question.count }
+        expect { post_question }.not_to change { Question.count }
       end
-      it 'should render new view' do
-        post :create, params: { question: attributes_for(:question, :invalid) }
-        expect(response).to render_template :new
+      it 'should redirect to new user session path' do
+        post_question
+        expect(response).to redirect_to new_user_session_path
       end
     end
   end
@@ -61,13 +73,13 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    let(:question) { create :question, user: user }
-    let(:another_question) { create :question }
+    let!(:question) { create :question, user: user }
+    let!(:another_question) { create :question }
 
     describe 'by authenticated user' do
       before { login(user) }
 
-      describe 'should delete own question' do
+      describe 'for own question' do
         before { delete :destroy, params: { id: question } }
 
         it 'should destroy question' do
@@ -79,17 +91,29 @@ RSpec.describe QuestionsController, type: :controller do
         end
       end
 
-      it 'should not delete another question' do
-        delete :destroy, params: { id: another_question }
+      describe 'for another`s question' do
+        before { delete :destroy, params: { id: another_question } }
 
-        expect(Question.all).to include(another_question)
+        it 'should not delete another question' do
+          expect(Question.all).to include(another_question)
+        end
+
+        it 'should redirect to questions_path' do
+          expect(response).to redirect_to questions_path
+        end
       end
     end
 
-    it 'by unauthenticated user should not delete any question' do
-      delete :destroy, params: { id: question }
+    describe 'by unauthenticated user' do
+      before { delete :destroy, params: { id: question } }
 
-      expect(Question.all).to include(question)
+      it 'should not delete any question' do
+        expect(Question.all).to include(question)
+      end
+
+      it 'should redirect to new user session path' do
+        expect(response).to redirect_to new_user_session_path
+      end
     end
   end
 
