@@ -64,24 +64,32 @@ RSpec.describe QuestionsController, type: :controller do
     let(:question) { create :question, user: user }
     let(:another_question) { create :question }
 
-    before { login(user) }
+    describe 'by authenticated user' do
+      before { login(user) }
 
-    describe 'own question' do
-      before { delete :destroy, params: { id: question } }
+      describe 'should delete own question' do
+        before { delete :destroy, params: { id: question } }
 
-      it 'should destroy question' do
-        expect(Question.all).not_to include(question)
+        it 'should destroy question' do
+          expect(Question.all).not_to include(question)
+        end
+
+        it 'should redirect to questions_path' do
+          expect(response).to redirect_to questions_path
+        end
       end
 
-      it 'should redirect to questions_path' do
-        expect(response).to redirect_to questions_path
+      it 'should not delete another question' do
+        delete :destroy, params: { id: another_question }
+
+        expect(Question.all).to include(another_question)
       end
     end
 
-    it 'should not destroy another question' do
-      delete :destroy, params: { id: another_question }
+    it 'by unauthenticated user should not delete any question' do
+      delete :destroy, params: { id: question }
 
-      expect(Question.all).to include(another_question)
+      expect(Question.all).to include(question)
     end
   end
 

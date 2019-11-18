@@ -27,5 +27,9 @@ feature 'User can destroy his question', %q{
     expect(page).not_to have_content('Delete question')
   end
 
-  scenario 'Unauthenticated user tries to destroy question'
+  scenario 'Unauthenticated user tries to destroy question' do
+    visit question_path(question)
+
+    expect(page).not_to have_content('Delete question')
+  end
 end
