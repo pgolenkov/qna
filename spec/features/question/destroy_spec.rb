@@ -8,6 +8,7 @@ feature 'User can destroy his question', %q{
 
   given(:user) { create :user }
   given(:question) { create :question, user: user }
+  given(:another_question) { create :question }
 
   scenario 'Authenticated user destroys his question' do
     login(user)
@@ -19,6 +20,12 @@ feature 'User can destroy his question', %q{
     expect(page).not_to have_content(question.title)
   end
 
-  scenario 'Authenticated user tries to destroy another`s question'
+  scenario 'Authenticated user tries to destroy another`s question' do
+    login(user)
+    visit question_path(another_question)
+
+    expect(page).not_to have_content('Delete question')
+  end
+
   scenario 'Unauthenticated user tries to destroy question'
 end

@@ -62,16 +62,26 @@ RSpec.describe QuestionsController, type: :controller do
 
   describe 'DELETE #destroy' do
     let(:question) { create :question, user: user }
+    let(:another_question) { create :question }
 
     before { login(user) }
-    before { delete :destroy, params: { id: question } }
 
-    it 'should destroy question' do
-      expect(Question.all).not_to include(question)
+    describe 'own question' do
+      before { delete :destroy, params: { id: question } }
+
+      it 'should destroy question' do
+        expect(Question.all).not_to include(question)
+      end
+
+      it 'should redirect to questions_path' do
+        expect(response).to redirect_to questions_path
+      end
     end
 
-    it 'should redirect to questions_path' do
-      expect(response).to redirect_to questions_path
+    it 'should not destroy another question' do
+      delete :destroy, params: { id: another_question }
+
+      expect(Question.all).to include(another_question)
     end
   end
 

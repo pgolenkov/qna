@@ -13,8 +13,11 @@ class QuestionsController < ApplicationController
   end
 
   def destroy
-    question.destroy
-    redirect_to questions_path, notice: 'Your question successfully destroyed.'
+    if current_user.questions.include?(question)
+      question.destroy
+      flash[:notice] = 'Your question successfully destroyed.'
+    end
+    redirect_to questions_path
   end
 
   private
