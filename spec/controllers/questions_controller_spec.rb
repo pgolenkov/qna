@@ -73,8 +73,8 @@ RSpec.describe QuestionsController, type: :controller do
       before { login(user) }
 
       describe 'for own question' do
-        before { subject }
         it 'should destroy question' do
+          expect { subject }.to change { Question.count }.by(-1)
           expect(Question).not_to exist(question.id)
         end
 
@@ -85,6 +85,7 @@ RSpec.describe QuestionsController, type: :controller do
         subject! { delete :destroy, params: { id: another_question } }
 
         it 'should not delete another question' do
+          expect { subject }.not_to change { Question.count }
           expect(Question).to exist(another_question.id)
         end
 
@@ -93,8 +94,8 @@ RSpec.describe QuestionsController, type: :controller do
     end
 
     describe 'by unauthenticated user' do
-      before { subject }
       it 'should not delete any question' do
+        expect { subject }.not_to change { Question.count }
         expect(Question).to exist(question.id)
       end
 

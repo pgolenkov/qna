@@ -16,19 +16,19 @@ RSpec.describe User, type: :model do
     let(:another_answer) { create :answer, question: question }
 
     it 'should return true if user is an author of question' do
-      expect(user.author?(question)).to be_truthy
+      expect(user).to be_author(question)
     end
 
     it 'should return false if user is not an author of question' do
-      expect(user.author?(another_question)).to be_falsey
+      expect(user).not_to be_author(another_question)
     end
 
     it 'should return true if user is an author of answer' do
-      expect(user.author?(answer)).to be_truthy
+      expect(user).to be_author(answer)
     end
 
     it 'should return false if user is not an author of answer' do
-      expect(user.author?(another_answer)).to be_falsey
+      expect(user).not_to be_author(another_answer)
     end
   end
 end
