@@ -46,8 +46,8 @@ RSpec.describe AnswersController, type: :controller do
       before { login(user) }
 
       describe 'for own answer' do
-        before { subject }
         it 'should destroy answer' do
+          expect { subject }.to change { Answer.count }.by(-1)
           expect(Answer).not_to exist(answer.id)
         end
 
@@ -56,8 +56,9 @@ RSpec.describe AnswersController, type: :controller do
 
       describe 'for another`s answer' do
         subject { delete :destroy, params: { question_id: another_answer.question, id: another_answer } }
-        before { subject }
+
         it 'should not delete answer' do
+          expect { subject }.not_to change { Answer.count }
           expect(Answer).to exist(another_answer.id)
         end
 
