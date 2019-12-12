@@ -5,7 +5,7 @@ RSpec.describe AnswersController, type: :controller do
   let(:user) { create :user }
 
   describe 'POST #create' do
-    subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer) }}
+    subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer) }, format: :js }
 
     describe 'by authenticated user' do
       before { login(user) }
@@ -14,16 +14,16 @@ RSpec.describe AnswersController, type: :controller do
         it 'should create new answer for question' do
           expect { subject }.to change { question.answers.count }.by(1)
         end
-        it { should redirect_to(question) }
+        it { should render_template(:create) }
       end
       context 'with invalid params' do
-        subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer, :invalid) } }
+        subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer, :invalid) }, format: :js }
 
         it 'should not create new answer' do
           expect { subject }.not_to change { Answer.count }
         end
 
-        it { should render_template('questions/show') }
+        it { should render_template(:create) }
       end
     end
 
@@ -31,7 +31,10 @@ RSpec.describe AnswersController, type: :controller do
       it 'should not create new answer' do
         expect { subject }.not_to change { Answer.count }
       end
-      it { should redirect_to(new_user_session_path) }
+      it 'should return unauthorized status' do
+        subject
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 

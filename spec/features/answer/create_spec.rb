@@ -8,7 +8,7 @@ feature 'User can create answer for question', %q{
 
   given(:question) { create :question }
 
-  describe 'Authenticated user' do
+  describe 'Authenticated user', js: true do
     given(:user) { create :user }
 
     background do
@@ -20,9 +20,9 @@ feature 'User can create answer for question', %q{
       fill_in 'Body', with: 'Text of answer'
       click_on 'Add answer'
 
-      expect(page).to have_content 'Your answer successfully created!'
       expect(page).to have_content 'Text of answer'
       expect(page).to have_content question.body
+      expect(find('#answer_body').value).to be_empty
     end
 
     scenario 'adds an answer for the selected question with errors' do
@@ -34,9 +34,8 @@ feature 'User can create answer for question', %q{
 
   scenario 'Unauthenticated user tries add an answer' do
     visit question_path(question)
-    click_on 'Add answer'
 
-    expect(page).to have_content 'You need to sign in or sign up before continuing.'
+    expect(page).to have_no_button 'Add answer'
   end
 
 end

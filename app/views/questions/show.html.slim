@@ -1,14 +1,17 @@
 p= question.title
 p= question.body
 
-= render question.answers
+.answers
+  = render question.answers
 
-= render 'shared/errors', resource: answer
+.answer-errors
+  = render 'shared/errors', resource: answer
 
-= form_with model: [question, answer], local: true do |f|
-  = f.label :body
-  = f.text_area :body
-  = f.submit 'Add answer'
+- if current_user
+  = form_with model: [question, answer] do |f|
+    = f.label :body
+    = f.text_area :body
+    = f.submit 'Add answer'
 
-- if current_user && current_user.questions.include?(question)
-  = link_to 'Delete question', question, method: :delete
+  - if current_user.questions.include?(question)
+    = link_to 'Delete question', question, method: :delete
