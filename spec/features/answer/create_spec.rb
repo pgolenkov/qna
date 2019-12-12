@@ -22,7 +22,7 @@ feature 'User can create answer for question', %q{
 
       expect(page).to have_content 'Text of answer'
       expect(page).to have_content question.body
-      expect(find('#answer_body').value).to be_empty
+      expect(find('.new-answer #answer_body').value).to be_empty
     end
 
     scenario 'adds an answer for the selected question with errors' do
