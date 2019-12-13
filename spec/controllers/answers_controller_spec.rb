@@ -96,7 +96,7 @@ RSpec.describe AnswersController, type: :controller do
     let!(:answer) { create :answer, question: question, user: user }
     let!(:another_answer) { create :answer, question: question }
 
-    subject { delete :destroy, params: { question_id: answer.question, id: answer } }
+    subject { delete :destroy, params: { question_id: answer.question, id: answer }, format: :js }
 
     describe 'by authenticated user' do
       before { login(user) }
@@ -107,18 +107,21 @@ RSpec.describe AnswersController, type: :controller do
           expect(Answer).not_to exist(answer.id)
         end
 
-        it { should redirect_to(question_path(question)) }
+        it { should render_template(:destroy) }
       end
 
       describe 'for another`s answer' do
-        subject { delete :destroy, params: { question_id: another_answer.question, id: another_answer } }
+        subject { delete :destroy, params: { question_id: another_answer.question, id: another_answer }, format: :js }
 
         it 'should not delete answer' do
           expect { subject }.not_to change { Answer.count }
           expect(Answer).to exist(another_answer.id)
         end
 
-        it { should redirect_to(question_path(question)) }
+        it 'should return forbidden status' do
+          subject
+          expect(response).to have_http_status(:forbidden)
+        end
       end
     end
 
@@ -128,7 +131,10 @@ RSpec.describe AnswersController, type: :controller do
         expect(Answer).to exist(answer.id)
       end
 
-      it { should redirect_to(new_user_session_path) }
+      it 'should return unauthorized status' do
+        subject
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 

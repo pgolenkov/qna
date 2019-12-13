@@ -20,9 +20,10 @@ class AnswersController < ApplicationController
   def destroy
     if current_user.author?(answer)
       answer.destroy
-      flash[:notice] = 'Your answer successfully destroyed.'
+      flash.now[:notice] = 'Your answer successfully destroyed.'
+    else
+      head :forbidden
     end
-    redirect_to question
   end
 
   private

@@ -2,7 +2,7 @@ div id="answer-#{answer.id}"
   = answer.body
   - if current_user&.author?(answer)
     = link_to 'Edit answer', '#', class: 'edit-answer-link', data: { answer_id: answer.id }
-    = link_to 'Delete answer', answer, method: :delete
+    = link_to 'Delete answer', answer, method: :delete, remote: true
 
     .update-answer-errors
       = render 'shared/errors', resource: answer

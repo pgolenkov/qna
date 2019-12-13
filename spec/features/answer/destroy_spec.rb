@@ -11,7 +11,7 @@ feature 'User can destroy his answer', %q{
   given!(:answer) { create :answer, question: question, user: user }
   given!(:another_answer) { create :answer, question: question }
 
-  scenario 'Authenticated user destroys his answer' do
+  scenario 'Authenticated user destroys his answer', js: true do
     login(user)
     visit question_path(question)
 
@@ -21,7 +21,8 @@ feature 'User can destroy his answer', %q{
       click_on 'Delete answer'
     end
 
-    expect(page).to have_content('Your answer successfully destroyed.')
+    expect(page).to have_content(question.title)
+    expect(page).to have_content(question.body)
     expect(page).not_to have_content(answer.body)
   end
 
