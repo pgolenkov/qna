@@ -12,6 +12,14 @@ class QuestionsController < ApplicationController
     end
   end
 
+  def update
+    if current_user.author?(question)
+      question.update(question_params)
+    else
+      head :forbidden
+    end
+  end
+
   def destroy
     if current_user.author?(question)
       question.destroy

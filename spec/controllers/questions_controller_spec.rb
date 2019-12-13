@@ -55,6 +55,61 @@ RSpec.describe QuestionsController, type: :controller do
     end
   end
 
+  describe 'PATCH #update' do
+    let!(:question) { create :question, user: user }
+    subject { patch :update, params: { id: question, question: { title: 'Edited title', body: 'Edited body'} }, format: :js }
+
+    describe 'by authenticated user' do
+      before { login(user) }
+
+      context 'his question with valid params' do
+        it 'should change question' do
+          subject
+          expect(question.reload.title).to eq 'Edited title'
+          expect(question.body).to eq 'Edited body'
+        end
+        it { should render_template(:update) }
+      end
+
+      context 'his question with invalid params' do
+        subject { patch :update, params: { id: question, question: { title: '' } }, format: :js }
+
+        it 'should not change question' do
+          expect { subject }.to_not change(question, :title)
+        end
+
+        it { should render_template(:update) }
+      end
+
+      context "another user's question" do
+        let!(:another_question) { create :question }
+        subject { patch :update, params: { id: another_question, question: { title: 'Edited title' }, format: :js } }
+        before { subject }
+
+        it 'should not change question' do
+          expect { subject }.to_not change(another_question, :title)
+        end
+
+        it 'should return forbidden status' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+    end
+
+    describe 'by unauthenticated user' do
+      before { subject }
+
+      it 'should not change question' do
+        expect { subject }.to_not change(question, :title)
+        expect { subject }.to_not change(question, :body)
+      end
+
+      it 'should return unauthorized status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe 'GET #show' do
     let(:question) { create :question, user: user }
     before { get :show, params: { id: question } }
