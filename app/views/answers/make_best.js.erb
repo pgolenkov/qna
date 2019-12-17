@@ -1,0 +1,12 @@
+var answer_block = $('#answer-<%= answer.id %>')
+answer_block.remove()
+answer_block.find('.best-answer').html('The best answer')
+answer_block.find('.make-best-answer').html('')
+
+$('.answers').prepend(answer_block)
+
+<% if @prev_best_answer %>
+  var prev_best_answer_block = $('#answer-<%= @prev_best_answer.id %>')
+  prev_best_answer_block.find('.best-answer').html('')
+  prev_best_answer_block.find('.make-best-answer').html('<%= link_to "Mark as the best", make_best_answer_path(@prev_best_answer), method: :patch, remote: true %>')
+<% end %>

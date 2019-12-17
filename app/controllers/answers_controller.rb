@@ -17,10 +17,19 @@ class AnswersController < ApplicationController
     end
   end
 
+  def make_best
+    if current_user.author?(answer.question)
+      @prev_best_answer = answer.question.answers.find_by(best: true)
+      @prev_best_answer.update(best: false) if @prev_best_answer
+      answer.update(best: true)
+    else
+      head :forbidden
+    end
+  end
+
   def destroy
     if current_user.author?(answer)
       answer.destroy
-      flash.now[:notice] = 'Your answer successfully destroyed.'
     else
       head :forbidden
     end
