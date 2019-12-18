@@ -13,5 +13,5 @@
     = f.text_area :body
     = f.submit 'Add answer'
 
-  - if current_user.questions.include?(question)
+  - if current_user.author?(question)
     = link_to 'Delete question', question, method: :delete

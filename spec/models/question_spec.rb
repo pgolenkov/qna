@@ -9,10 +9,10 @@ RSpec.describe Question, type: :model do
 
   it { should validate_uniqueness_of :title }
 
-  describe '#best_answer' do
-    let(:question) { create :question }
-    let(:answers) { create_list :answer, 2, question: question }
+  let(:question) { create :question }
+  let(:answers) { create_list :answer, 2, question: question }
 
+  describe '#best_answer' do
     it 'should return nil if no best answer of question' do
       expect(question.best_answer).to be_nil
     end
@@ -20,6 +20,14 @@ RSpec.describe Question, type: :model do
     it 'should return the best answer of question' do
       answers.last.best!
       expect(question.best_answer).to eq answers.last
+    end
+  end
+
+  describe 'the best answer of question answers' do
+    before { answers.last.best! }
+
+    it 'should be on the first position' do
+      expect(question.answers.first).to eq answers.last
     end
   end
 end
