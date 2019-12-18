@@ -93,29 +93,17 @@ RSpec.describe AnswersController, type: :controller do
 
   describe 'PATCH #make_best' do
     let(:question) { create :question, user: user }
-    let!(:answers) { create_list :answer, 2, question: question }
-    subject { patch :make_best, params: { id: answers.last }, format: :js }
+    let!(:answer) { create :answer, question: question }
+    subject { patch :make_best, params: { id: answer }, format: :js }
 
     describe 'by authenticated user' do
       before { login(user) }
 
       context 'answer for his question' do
 
-        context 'when no best answers' do
-          it 'should make answer the best' do
-            subject
-            expect(answers.last.reload).to be_best
-          end
-        end
-
-        context 'when the question has the best answer' do
-          before { answers.first.update(best: true) }
-
-          it 'should change the best answer' do
-            subject
-            expect(answers.first.reload).not_to be_best
-            expect(answers.last.reload).to be_best
-          end
+        it 'should make answer the best' do
+          subject
+          expect(answer.reload).to be_best
         end
 
         it { should render_template(:make_best) }
@@ -141,7 +129,7 @@ RSpec.describe AnswersController, type: :controller do
       before { subject }
 
       it 'should not make any answers to the best' do
-        expect(answers.last.reload).not_to be_best
+        expect(answer.reload).not_to be_best
       end
 
       it 'should return unauthorized status' do

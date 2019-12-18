@@ -2,7 +2,7 @@
   = render 'question_full'
 
 .answers
-  = render question.answers.order(best: :desc)
+  = render question.answers
 
 .answer-errors
   = render 'shared/errors', resource: answer

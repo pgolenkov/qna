@@ -7,5 +7,9 @@ FactoryBot.define do
     trait :invalid do
       body { nil }
     end
+
+    trait :best do
+      best { true }
+    end
   end
 end

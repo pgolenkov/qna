@@ -23,14 +23,13 @@ feature 'User can mark the best answer for question', %q{
 
         expect(page).to have_no_link('Mark as the best')
         expect(page).to have_content('The best answer')
-        expect(answers.last.reload).to be_best
       end
       expect(answers.last.body).to appear_before(answers.first.body)
     end
 
     describe 'when there is the best answer for the question' do
       background do
-        answers.last.update(best: true)
+        answers.last.best!
         visit question_path(question)
       end
 
@@ -50,13 +49,11 @@ feature 'User can mark the best answer for question', %q{
         within "#answer-#{answers.first.id}" do
           expect(page).to have_no_link('Mark as the best')
           expect(page).to have_content('The best answer')
-          expect(answers.first.reload).to be_best
         end
 
         within "#answer-#{answers.last.id}" do
           expect(page).to have_link('Mark as the best')
           expect(page).to have_no_content('The best answer')
-          expect(answers.last.reload).not_to be_best
         end
 
         expect(answers.first.body).to appear_before(answers.last.body)

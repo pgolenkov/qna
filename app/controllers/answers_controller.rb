@@ -19,9 +19,8 @@ class AnswersController < ApplicationController
 
   def make_best
     if current_user.author?(answer.question)
-      @prev_best_answer = answer.question.answers.find_by(best: true)
-      @prev_best_answer.update(best: false) if @prev_best_answer
-      answer.update(best: true)
+      @prev_best_answer = answer.question.best_answer
+      answer.best!
     else
       head :forbidden
     end

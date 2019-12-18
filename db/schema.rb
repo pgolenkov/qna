@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2019_12_17_034211) do
     t.bigint "user_id"
     t.boolean "best", default: false, null: false
     t.index ["question_id"], name: "index_answers_on_question_id"
+    t.index ["question_id"], name: "unique_index_on_question_id_for_best_answers", unique: true, where: "(best = true)"
     t.index ["user_id"], name: "index_answers_on_user_id"
   end
 

@@ -97,14 +97,16 @@ RSpec.describe QuestionsController, type: :controller do
     end
 
     describe 'by unauthenticated user' do
-      before { subject }
-
-      it 'should not change question' do
+      it 'should not change question`s title' do
         expect { subject }.to_not change(question, :title)
+      end
+
+      it 'should not change question`s body' do
         expect { subject }.to_not change(question, :body)
       end
 
       it 'should return unauthorized status' do
+        subject
         expect(response).to have_http_status(:unauthorized)
       end
     end

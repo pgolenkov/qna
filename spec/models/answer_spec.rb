@@ -7,27 +7,33 @@ RSpec.describe Answer, type: :model do
   it { should validate_presence_of :body }
 
   describe 'validates uniqueness of best answer for one question' do
+    subject { create :answer, :best }
+    it { should validate_uniqueness_of(:question_id).scoped_to(:best) }
+  end
+
+  describe 'doesn`t validate uniqueness of not best answer for one question' do
+    subject { create :answer }
+    it { should_not validate_uniqueness_of(:question_id).scoped_to(:best) }
+  end
+
+  describe '#best!' do
     let(:question) { create :question }
     let(:answers) { create_list :answer, 2, question: question }
-    let(:other_question_answer) { create :answer }
+    let(:other_question_best_answer) { create :answer, :best }
 
-    before { answers.first.update(best: true) }
+    before { answers.first.best! }
 
-    context 'answers for one question' do
-      before { answers.second.best = true }
-
-      it 'second answer with best attibute is not to be valid' do
-        expect(answers.first).to be_valid
-        expect(answers.second).not_to be_valid
-      end
+    it 'should set the answer the best' do
+      expect(answers.first.reload).to be_best
     end
 
-    context 'answers for different questions' do
-      before { other_question_answer.best = true }
+    it 'should reset best attribute for other answers of question' do
+      answers.second.best!
+      expect(answers.first.reload).not_to be_best
+    end
 
-      it 'answer for other question with best attibute is to be valid' do
-        expect(other_question_answer).to be_valid
-      end
+    it 'should not reset best attribute for answers of other question' do
+      expect(other_question_best_answer.reload).to be_best
     end
   end
 end
