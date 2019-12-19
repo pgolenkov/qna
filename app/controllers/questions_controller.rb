@@ -2,7 +2,7 @@ class QuestionsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
 
   expose :questions, ->{ Question.all }
-  expose :question, build: ->(params, scope){ current_user.questions.build(params) }
+  expose :question, scope: :with_attached_files, build: ->(params, scope){ current_user.questions.build(params) }
 
   def create
     if question.save
@@ -31,7 +31,7 @@ class QuestionsController < ApplicationController
   private
 
   def question_params
-    params.require(:question).permit(:title, :body)
+    params.require(:question).permit(:title, :body, files: [])
   end
 
   def answer

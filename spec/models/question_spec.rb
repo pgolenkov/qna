@@ -30,4 +30,8 @@ RSpec.describe Question, type: :model do
       expect(question.answers.first).to eq answers.last
     end
   end
+
+  it 'have many attached files' do
+    expect(question.files).to be_an_instance_of(ActiveStorage::Attached::Many)
+  end
 end

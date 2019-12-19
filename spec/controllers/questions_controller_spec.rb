@@ -38,6 +38,13 @@ RSpec.describe QuestionsController, type: :controller do
         end
       end
 
+      context 'with attached files' do
+        it 'should attach files to question' do
+          post :create, params: { question: { title: 'Title', body: 'Body', files: [fixture_file_upload('spec/spec_helper.rb')]} }
+          expect(Question.last.files).to be_attached
+        end
+      end
+
       context 'with invalid params' do
         subject { post :create, params: { question: attributes_for(:question, :invalid) } }
         it 'should not create new question' do
