@@ -78,6 +78,13 @@ RSpec.describe QuestionsController, type: :controller do
         it { should render_template(:update) }
       end
 
+      context 'with attached files' do
+        it 'should attach files to question' do
+          patch :update, params: { id: question, question: { files: [fixture_file_upload('spec/spec_helper.rb')] } }, format: :js
+          expect(question.reload.files).to be_attached
+        end
+      end
+
       context 'his question with invalid params' do
         subject { patch :update, params: { id: question, question: { title: '' } }, format: :js }
 

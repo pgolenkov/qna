@@ -33,6 +33,28 @@ feature 'User can edit question', %q{
         end
       end
 
+      scenario 'adding attached files' do
+        within '.question' do
+          attach_file 'Files', ["#{Rails.root}/spec/rails_helper.rb", "#{Rails.root}/spec/spec_helper.rb"]
+          click_on 'Save'
+
+          expect(page).to have_content 'rails_helper.rb'
+          expect(page).to have_content 'spec_helper.rb'
+        end
+      end
+
+      scenario 'adding attached files to question with files' do
+        question.files.attach(io: File.open("#{Rails.root}/spec/rails_helper.rb"), filename: 'rails_helper.rb')
+
+        within '.question' do
+          attach_file 'Files', ["#{Rails.root}/spec/spec_helper.rb"]
+          click_on 'Save'
+
+          expect(page).to have_content 'rails_helper.rb'
+          expect(page).to have_content 'spec_helper.rb'
+        end
+      end
+
       scenario 'with errors' do
         within '.question' do
           fill_in 'Body', with: ''
