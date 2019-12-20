@@ -25,6 +25,15 @@ feature 'User can create answer for question', %q{
       expect(find('.new-answer #answer_body').value).to be_empty
     end
 
+    scenario 'adds an answer for the question with attached files' do
+      fill_in 'Body', with: 'Text of answer'
+      attach_file 'Files', ["#{Rails.root}/spec/rails_helper.rb", "#{Rails.root}/spec/spec_helper.rb"]
+      click_on 'Add answer'
+
+      expect(page).to have_content 'rails_helper.rb'
+      expect(page).to have_content 'spec_helper.rb'
+    end
+
     scenario 'adds an answer for the selected question with errors' do
       click_on 'Add answer'
 

@@ -16,6 +16,14 @@ RSpec.describe AnswersController, type: :controller do
         end
         it { should render_template(:create) }
       end
+
+      context 'with attached files' do
+        it 'should attach files to answer' do
+          post :create, params: { question_id: question.id, answer: { body: 'Body', files: [fixture_file_upload('spec/spec_helper.rb')]}, format: :js }
+          expect(Answer.last.files).to be_attached
+        end
+      end
+
       context 'with invalid params' do
         subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer, :invalid) }, format: :js }
 

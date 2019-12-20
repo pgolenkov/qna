@@ -3,7 +3,7 @@ class AnswersController < ApplicationController
 
   expose :question, id: :question_id
   expose :answers, parent: :question
-  expose :answer, build: ->(params, scope){ current_user.answers.where(question: question).build(params) }
+  expose :answer, scope: :with_attached_files, build: ->(params, scope){ current_user.answers.where(question: question).build(params) }
 
   def create
     answer.save
@@ -37,6 +37,6 @@ class AnswersController < ApplicationController
   private
 
   def answer_params
-    params.require(:answer).permit(:body)
+    params.require(:answer).permit(:body, files: [])
   end
 end
