@@ -5,8 +5,10 @@
 
 - if question.files.attached?
   - question.files.each do |file|
-    .question-attached-file
+    .question-attached-file id="question-file-#{file.id}"
       = link_to file.filename.to_s, url_for(file)
+      - if current_user&.author?(question)
+        = link_to 'Delete', remove_file_question_path(question, file_id: file.id), remote: true, method: :patch
 
 - if current_user&.author?(question)
   = link_to 'Edit question', '#', class: 'edit-question-link'

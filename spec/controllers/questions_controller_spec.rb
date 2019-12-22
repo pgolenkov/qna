@@ -126,6 +126,62 @@ RSpec.describe QuestionsController, type: :controller do
     end
   end
 
+  describe 'PATCH #remove_file' do
+    let!(:question) { create :question, user: user, files: [fixture_file_upload('spec/spec_helper.rb')] }
+    let!(:another_question) { create :question, files: [fixture_file_upload('spec/rails_helper.rb')] }
+
+    subject { patch :remove_file, params: { id: question, file_id: question.files.first.id, format: :js } }
+
+    describe 'by authenticated user' do
+      before { login(user) }
+
+      context 'his question' do
+        it 'should remove file from question' do
+          subject
+          expect(question.reload.files).not_to be_attached
+        end
+
+        it { should render_template(:remove_file) }
+      end
+
+      context 'another user`s question' do
+        subject! { patch :remove_file, params: { id: another_question, file_id: another_question.files.first.id, format: :js } }
+
+        it 'should not remove file from question' do
+          expect(another_question.reload.files).to be_attached
+        end
+
+        it 'should return forbidden status' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context 'file of another question' do
+        subject! { patch :remove_file, params: { id: question, file_id: another_question.files.first.id, format: :js } }
+
+        it 'should not remove file from question' do
+          expect(another_question.reload.files).to be_attached
+        end
+
+        it 'should return not found status' do
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    describe 'by unauthenticated user' do
+      before { subject }
+
+      it 'should not remove file from question' do
+        expect(question.reload.files).to be_attached
+      end
+
+      it 'should return unauthorized status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe 'GET #show' do
     let(:question) { create :question, user: user }
     before { get :show, params: { id: question } }
