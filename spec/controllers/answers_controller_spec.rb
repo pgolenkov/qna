@@ -106,6 +106,62 @@ RSpec.describe AnswersController, type: :controller do
     end
   end
 
+  describe 'PATCH #remove_file' do
+    let!(:answer) { create :answer, user: user, files: [fixture_file_upload('spec/spec_helper.rb')] }
+    let!(:another_answer) { create :answer, files: [fixture_file_upload('spec/rails_helper.rb')] }
+
+    subject { patch :remove_file, params: { id: answer, file_id: answer.files.first.id, format: :js } }
+
+    describe 'by authenticated user' do
+      before { login(user) }
+
+      context 'his answer' do
+        it 'should remove file from answer' do
+          subject
+          expect(answer.reload.files).not_to be_attached
+        end
+
+        it { should render_template(:remove_file) }
+      end
+
+      context 'another user`s answer' do
+        subject! { patch :remove_file, params: { id: another_answer, file_id: another_answer.files.first.id, format: :js } }
+
+        it 'should not remove file from question' do
+          expect(another_answer.reload.files).to be_attached
+        end
+
+        it 'should return forbidden status' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context 'file of another answer' do
+        subject! { patch :remove_file, params: { id: answer, file_id: another_answer.files.first.id, format: :js } }
+
+        it 'should not remove file from answer' do
+          expect(another_answer.reload.files).to be_attached
+        end
+
+        it 'should return not found status' do
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    describe 'by unauthenticated user' do
+      before { subject }
+
+      it 'should not remove file from answer' do
+        expect(answer.reload.files).to be_attached
+      end
+
+      it 'should return unauthorized status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe 'PATCH #make_best' do
     let(:question) { create :question, user: user }
     let!(:answer) { create :answer, question: question }

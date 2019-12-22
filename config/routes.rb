@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resources :questions do
     resources :answers, shallow: true do
       patch :make_best, on: :member
+      patch :remove_file, on: :member
     end
     patch :remove_file, on: :member
   end

@@ -1,5 +1,6 @@
 class AnswersController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
+  before_action :check_author, only: [:update, :remove_file, :destroy]
 
   expose :question, id: :question_id
   expose :answers, parent: :question
@@ -10,11 +11,14 @@ class AnswersController < ApplicationController
   end
 
   def update
-    if current_user.author?(answer)
-      answer.update(answer_params)
-    else
-      head :forbidden
-    end
+    answer.update(answer_params)
+  end
+
+  def remove_file
+    @file = answer.files.find(params[:file_id])
+    @file.purge
+  rescue ActiveRecord::RecordNotFound
+    head :not_found
   end
 
   def make_best
@@ -27,16 +31,16 @@ class AnswersController < ApplicationController
   end
 
   def destroy
-    if current_user.author?(answer)
-      answer.destroy
-    else
-      head :forbidden
-    end
+    answer.destroy
   end
 
   private
 
   def answer_params
     params.require(:answer).permit(:body, files: [])
+  end
+
+  def check_author
+    head(:forbidden) unless current_user.author?(answer)
   end
 end

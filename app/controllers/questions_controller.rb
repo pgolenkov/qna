@@ -42,4 +42,8 @@ class QuestionsController < ApplicationController
     @answer ||= question.answers.build
   end
   helper_method :answer
+
+  def check_author
+    head(:forbidden) unless current_user.author?(question)
+  end
 end
