@@ -2,4 +2,7 @@ $('.answer-errors').html("<%= render 'shared/errors', resource: answer %>")
 <% if answer.persisted? %>
   $('.answers').append("<%= j render answer %>")
   $('.new-answer #answer_body').val('')
+  $('.new-answer #answer_files').val('')
+  $('.new-answer input[name="answer[files][]"][type="hidden"]').remove()
+  $('.new-answer #answer_files').prop("disabled", false)
 <% end %>
