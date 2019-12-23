@@ -1,6 +1,6 @@
 class AnswersController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :check_author, only: [:update, :remove_file, :destroy]
+  before_action :check_author, only: [:update, :destroy]
 
   expose :question, id: :question_id
   expose :answers, parent: :question
@@ -12,13 +12,6 @@ class AnswersController < ApplicationController
 
   def update
     answer.update(answer_params)
-  end
-
-  def remove_file
-    @file = answer.files.find(params[:file_id])
-    @file.purge
-  rescue ActiveRecord::RecordNotFound
-    head :not_found
   end
 
   def make_best

@@ -2,11 +2,7 @@ div id="answer-#{answer.id}"
   = answer.body
 
   - if answer.files.attached?
-    - answer.files.each do |file|
-      .answer-attached-file id="answer-file-#{file.id}"
-        = link_to file.filename.to_s, url_for(file)
-        - if current_user&.author?(answer)
-          = link_to 'Delete', remove_file_answer_path(answer, file_id: file.id), remote: true, method: :patch
+    = render partial: 'attachments/attachment', collection: answer.files
 
   .best-answer
     = 'The best answer' if answer.best?

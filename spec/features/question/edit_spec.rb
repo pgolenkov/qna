@@ -35,6 +35,9 @@ feature 'User can edit question', %q{
 
       scenario 'adding attached files' do
         within '.question' do
+          expect(page).to have_no_content 'rails_helper.rb'
+          expect(page).to have_no_content 'spec_helper.rb'
+
           attach_file 'Files', ["#{Rails.root}/spec/rails_helper.rb", "#{Rails.root}/spec/spec_helper.rb"]
           click_on 'Save'
 
@@ -43,15 +46,24 @@ feature 'User can edit question', %q{
         end
       end
 
-      scenario 'adding attached files to question with files' do
-        question.files.attach(io: File.open("#{Rails.root}/spec/rails_helper.rb"), filename: 'rails_helper.rb')
+      context 'when question has files' do
+        background do
+          question.files.attach(io: File.open("#{Rails.root}/spec/rails_helper.rb"), filename: 'rails_helper.rb')
+          visit question_path(question)
+          click_on 'Edit question'
+        end
 
-        within '.question' do
-          attach_file 'Files', ["#{Rails.root}/spec/spec_helper.rb"]
-          click_on 'Save'
+        scenario 'adding attached files to question with files' do
+          within '.question' do
+            expect(page).to have_content 'rails_helper.rb'
+            expect(page).to have_no_content 'spec_helper.rb'
 
-          expect(page).to have_content 'rails_helper.rb'
-          expect(page).to have_content 'spec_helper.rb'
+            attach_file 'Files', ["#{Rails.root}/spec/spec_helper.rb"]
+            click_on 'Save'
+
+            expect(page).to have_content 'rails_helper.rb'
+            expect(page).to have_content 'spec_helper.rb'
+          end
         end
       end
 

@@ -26,6 +26,9 @@ feature 'User can create question', %q{
     end
 
     scenario 'asks a question with attached files' do
+      expect(page).to have_no_content 'rails_helper.rb'
+      expect(page).to have_no_content 'spec_helper.rb'
+      
       fill_in 'Title', with: 'Title of question'
       fill_in 'Body', with: 'Text of question'
       attach_file 'Files', ["#{Rails.root}/spec/rails_helper.rb", "#{Rails.root}/spec/spec_helper.rb"]

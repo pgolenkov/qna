@@ -18,7 +18,12 @@ feature 'User can remove file from answer', %q{
     end
 
     scenario 'removes specific attached file' do
-      within "#answer-file-#{answer.files.first.id}" do
+      within "#answer-#{answer.id}" do
+        expect(page).to have_content 'rails_helper.rb'
+        expect(page).to have_content 'spec_helper.rb'
+      end
+
+      within "#file-#{answer.files.first.id}" do
         click_on 'Delete'
       end
 
@@ -29,7 +34,7 @@ feature 'User can remove file from answer', %q{
     end
 
     scenario "tries to delete files of another user's answer" do
-      within "#answer-file-#{another_answer.files.first.id}" do
+      within "#file-#{another_answer.files.first.id}" do
         expect(page).to have_no_link "Delete"
       end
     end
@@ -37,7 +42,7 @@ feature 'User can remove file from answer', %q{
 
   scenario 'Unauthenticated user cannot remove images from answers' do
     visit question_path(question)
-    within "#answer-file-#{answer.files.first.id}" do
+    within "#file-#{answer.files.first.id}" do
       expect(page).to have_no_link "Delete"
     end
   end

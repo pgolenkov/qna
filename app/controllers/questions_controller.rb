@@ -1,6 +1,6 @@
 class QuestionsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :check_author, only: [:update, :remove_file]
+  before_action :check_author, only: :update
 
   expose :questions, ->{ Question.all }
   expose :question, scope: :with_attached_files, build: ->(params, scope){ current_user.questions.build(params) }
@@ -15,13 +15,6 @@ class QuestionsController < ApplicationController
 
   def update
     question.update(question_params)
-  end
-
-  def remove_file
-    @file = question.files.find(params[:file_id])
-    @file.purge
-  rescue ActiveRecord::RecordNotFound
-    head :not_found
   end
 
   def destroy
