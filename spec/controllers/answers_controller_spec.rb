@@ -24,6 +24,26 @@ RSpec.describe AnswersController, type: :controller do
         end
       end
 
+      context 'with links' do
+        context 'where links is valid' do
+          it 'should add links to answer' do
+            post :create, params: { question_id: question.id, answer: { body: 'Body', links_attributes: { 0 => { name: 'Google', url: 'https://google.com' }, 1 => { name: 'Yandex', url: 'https://yandex.ru' } } }, format: :js }
+            expect(Answer.last.links.pluck(:name).sort).to eq ['Google', 'Yandex']
+            expect(Answer.last.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
+          end
+        end
+        context 'where links is not valid' do
+          subject do
+            post :create, params: { question_id: question.id, answer: { body: 'Body', links_attributes: { 0 => { url: 'https://google.com' } } }, format: :js }
+          end
+
+          it 'should not create new answer' do
+            expect { subject }.not_to change { Answer.count }
+          end
+          it { should render_template(:create) }
+        end
+      end
+
       context 'with invalid params' do
         subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer, :invalid) }, format: :js }
 

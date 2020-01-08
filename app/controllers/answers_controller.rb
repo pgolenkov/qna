@@ -30,7 +30,7 @@ class AnswersController < ApplicationController
   private
 
   def answer_params
-    params.require(:answer).permit(:body, files: [])
+    params.require(:answer).permit(:body, links_attributes: [:name, :url], files: [])
   end
 
   def check_author

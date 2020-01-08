@@ -45,6 +45,26 @@ RSpec.describe QuestionsController, type: :controller do
         end
       end
 
+      context 'with links' do
+        context 'where links is valid' do
+          it 'should add links to question' do
+            post :create, params: { question: { title: 'Title', body: 'Body', links_attributes: { 0 => { name: 'Google', url: 'https://google.com' }, 1 => { name: 'Yandex', url: 'https://yandex.ru' } } } }
+            expect(Question.last.links.pluck(:name).sort).to eq ['Google', 'Yandex']
+            expect(Question.last.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
+          end
+        end
+        context 'where links is not valid' do
+          subject do
+            post :create, params: { question: { title: 'Title', body: 'Body', links_attributes: { 0 => { url: 'https://google.com' } } } }
+          end
+
+          it 'should not create new question' do
+            expect { subject }.not_to change { Question.count }
+          end
+          it { should render_template(:new) }
+        end
+      end
+
       context 'with invalid params' do
         subject { post :create, params: { question: attributes_for(:question, :invalid) } }
         it 'should not create new question' do

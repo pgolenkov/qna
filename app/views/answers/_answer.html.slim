@@ -1,5 +1,7 @@
 div id="answer-#{answer.id}"
   = answer.body
+  .answer-links
+    = render answer.links
 
   - if answer.files.attached?
     = render partial: 'attachments/attachment', collection: answer.files

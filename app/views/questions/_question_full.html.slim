@@ -2,6 +2,8 @@
   = question.title
 .question-body
   = question.body
+.question-links
+  = render question.links
 
 - if question.files.attached?
   = render partial: 'attachments/attachment', collection: question.files

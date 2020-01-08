@@ -1,0 +1,6 @@
+h3 Links
+#links
+  = f.fields_for :links do |link|
+    = render 'links/link_fields', f: link
+  .links
+    = link_to_add_association 'Add link', f, :links, partial: 'links/link_fields'

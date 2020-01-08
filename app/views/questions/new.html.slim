@@ -7,4 +7,5 @@
   = f.text_area :body
   = f.label :files
   = f.file_field :files, multiple: true, direct_upload: true
+  = render 'links/links_form', f: f
   = f.submit 'Ask'
