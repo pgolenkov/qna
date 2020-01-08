@@ -46,6 +46,21 @@ feature 'User can add links to question', %q{
       expect(page).to have_link 'Google', href: 'https://google.com'
       expect(page).to have_link 'Yandex', href: 'https://yandex.ru'
     end
+
+    scenario 'with invalid url link' do
+      fill_in 'Title', with: 'Title of question'
+      fill_in 'Body', with: 'Text of question'
+
+      within '#links' do
+        click_on 'Add link'
+        fill_in 'Name', with: 'Google'
+        fill_in 'Url', with: 'htps://google.com'
+      end
+      click_on 'Ask'
+
+      expect(page).to have_no_link 'Google', href: 'https://google.com'
+      expect(page).to have_content "Links url is not a valid URL"
+    end
   end
 
 end

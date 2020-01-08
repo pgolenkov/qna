@@ -54,6 +54,22 @@ feature 'User can add links to answer', %q{
         expect(page).to have_link 'Yandex', href: 'https://yandex.ru'
       end
     end
+
+    scenario 'with invalid url link' do
+      fill_in 'Body', with: 'Text of answer'
+
+      within '.new-answer' do
+        within '#links' do
+          click_on 'Add link'
+          fill_in 'Name', with: 'Google'
+          fill_in 'Url', with: 'htps://google.com'
+        end
+        click_on 'Add answer'
+      end
+
+      expect(page).to have_no_link 'Google', href: 'https://google.com'
+      expect(page).to have_content "Links url is not a valid URL"
+    end
   end
 
 end
