@@ -8,6 +8,7 @@ feature 'User can add links to answer', %q{
 
   given(:user) { create :user }
   given(:question) { create :question }
+  given(:my_gist_link) { 'https://gist.github.com/pashex/9b698d35948fe219a6d7441450053624' }
 
   background { login(user) }
 
@@ -69,6 +70,20 @@ feature 'User can add links to answer', %q{
 
       expect(page).to have_no_link 'Google', href: 'https://google.com'
       expect(page).to have_content "Links url is not a valid URL"
+    end
+
+    scenario 'with gist link' do
+      fill_in 'Body', with: 'Text of answer'
+
+      within '#links' do
+        click_on 'Add link'
+        fill_in 'Name', with: 'My gist'
+        fill_in 'Url', with: my_gist_link
+      end
+      click_on 'Add answer'
+
+      expect(page).to have_no_link 'My gist', href: my_gist_link
+      expect(page).to have_content "My test gist"
     end
   end
 

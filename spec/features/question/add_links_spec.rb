@@ -7,6 +7,8 @@ feature 'User can add links to question', %q{
 } do
 
   given(:user) { create :user }
+  given(:my_gist_link) { 'https://gist.github.com/pashex/9b698d35948fe219a6d7441450053624' }
+
   background { login(user) }
 
   describe 'User creates question', js: true do
@@ -60,6 +62,21 @@ feature 'User can add links to question', %q{
 
       expect(page).to have_no_link 'Google', href: 'https://google.com'
       expect(page).to have_content "Links url is not a valid URL"
+    end
+
+    scenario 'with gist link' do
+      fill_in 'Title', with: 'Title of question'
+      fill_in 'Body', with: 'Text of question'
+
+      within '#links' do
+        click_on 'Add link'
+        fill_in 'Name', with: 'My gist'
+        fill_in 'Url', with: my_gist_link
+      end
+      click_on 'Ask'
+
+      expect(page).to have_no_link 'My gist', href: my_gist_link
+      expect(page).to have_content "My test gist"
     end
   end
 
