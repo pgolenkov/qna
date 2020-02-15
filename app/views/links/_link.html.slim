@@ -1,6 +1,9 @@
-.link
+.link id="link-#{link.id}"
   - if link.gist?
     .gist
       = link.gist_raw
   - else
     = link_to link.name, link.url, target: '_blank'
+
+  - if current_user&.author?(link.linkable)
+    = link_to 'Delete link', link_path(link), remote: true, method: :delete
