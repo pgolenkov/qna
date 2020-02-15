@@ -103,4 +103,53 @@ feature 'User can add links to answer', %q{
     end
   end
 
+  describe 'User edits his answer', js: true do
+    given(:answer) { create :answer, user: user }
+
+    context 'when answer has no any links' do
+
+      scenario 'and add link to answer' do
+        visit question_path(answer.question)
+        within "#answer-#{answer.id}" do
+          click_on 'Edit answer'
+
+          expect(page).to have_no_link 'Google', href: 'https://google.com'
+
+          within '#links' do
+            click_on 'Add link'
+            fill_in 'Name', with: 'Google'
+            fill_in 'Url', with: 'https://google.com'
+          end
+          click_on 'Save'
+
+          expect(page).to have_link 'Google', href: 'https://google.com'
+        end
+      end
+    end
+
+    context 'when answer has links' do
+      given!(:link) { create :link, linkable: answer }
+
+      scenario 'and add link to answer' do
+        visit question_path(answer.question)
+        within "#answer-#{answer.id}" do
+          click_on 'Edit answer'
+
+          expect(page).to have_link link.name, href: link.url
+          expect(page).to have_no_link 'Google', href: 'https://google.com'
+
+          within '#links' do
+            click_on 'Add link'
+            fill_in 'Name', with: 'Google'
+            fill_in 'Url', with: 'https://google.com'
+          end
+          click_on 'Save'
+
+          expect(page).to have_link link.name, href: link.url
+          expect(page).to have_link 'Google', href: 'https://google.com'
+        end
+      end
+    end
+  end
+
 end

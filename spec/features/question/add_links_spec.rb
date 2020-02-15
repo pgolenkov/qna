@@ -97,4 +97,53 @@ feature 'User can add links to question', %q{
     end
   end
 
+  describe 'User edits his question', js: true do
+    given(:question) { create :question, user: user }
+
+    context 'when question has no any links' do
+
+      scenario 'and add link to question' do
+        visit question_path(question)
+        click_on 'Edit question'
+
+        within '.question' do
+          expect(page).to have_no_link 'Google', href: 'https://google.com'
+
+          within '#links' do
+            click_on 'Add link'
+            fill_in 'Name', with: 'Google'
+            fill_in 'Url', with: 'https://google.com'
+          end
+          click_on 'Save'
+
+          expect(page).to have_link 'Google', href: 'https://google.com'
+        end
+      end
+    end
+
+    context 'when question has links' do
+      given!(:link) { create :link, linkable: question }
+
+      scenario 'and add link to question' do
+        visit question_path(question)
+        click_on 'Edit question'
+
+        within '.question' do
+          expect(page).to have_link link.name, href: link.url
+          expect(page).to have_no_link 'Google', href: 'https://google.com'
+
+          within '#links' do
+            click_on 'Add link'
+            fill_in 'Name', with: 'Google'
+            fill_in 'Url', with: 'https://google.com'
+          end
+          click_on 'Save'
+
+          expect(page).to have_link link.name, href: link.url
+          expect(page).to have_link 'Google', href: 'https://google.com'
+        end
+      end
+    end
+  end
+
 end
