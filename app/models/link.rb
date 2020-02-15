@@ -16,6 +16,6 @@ class Link < ApplicationRecord
     raw_url = url.gsub(GIST_URL, RAW_GIST_URL) + '/raw/'
     response = HTTParty.get(raw_url)
 
-    response.body
+    response.code == 200 ? response.body : 'Wrong gist link'
   end
 end

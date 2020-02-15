@@ -26,6 +26,11 @@ RSpec.describe Link, type: :model do
       expect(link.gist_raw).to be_nil
     end
 
+    it 'should return error message if url of link is wrong github gist' do
+      link.url = gist_url.gsub('9', '8')
+      expect(link.gist_raw).to eq 'Wrong gist link'
+    end
+
     it 'should return gist raw if url of link is github gist' do
       link.url = gist_url
       expect(link.gist_raw).to eq 'My test gist'

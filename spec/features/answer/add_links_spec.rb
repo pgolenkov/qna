@@ -72,7 +72,7 @@ feature 'User can add links to answer', %q{
       expect(page).to have_content "Links url is not a valid URL"
     end
 
-    scenario 'with gist link' do
+    scenario 'with gist link and view gist raw' do
       fill_in 'Body', with: 'Text of answer'
 
       within '#links' do
@@ -84,6 +84,22 @@ feature 'User can add links to answer', %q{
 
       expect(page).to have_no_link 'My gist', href: my_gist_link
       expect(page).to have_content "My test gist"
+    end
+
+    scenario 'with wrong gist link and view error message' do
+      wrong_gist_link = my_gist_link.gsub('9','8')
+
+      fill_in 'Body', with: 'Text of answer'
+
+      within '#links' do
+        click_on 'Add link'
+        fill_in 'Name', with: 'My gist'
+        fill_in 'Url', with: wrong_gist_link
+      end
+      click_on 'Add answer'
+
+      expect(page).to have_no_link 'My gist', href: wrong_gist_link
+      expect(page).to have_content "Wrong gist link"
     end
   end
 
