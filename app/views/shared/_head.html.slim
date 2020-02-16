@@ -1,4 +1,9 @@
+= link_to 'Questions page', root_path
+
 - if current_user
+  |
+  = link_to 'My awards', awards_path
+  |
   = current_user.email
   |
   = link_to 'Log out', destroy_user_session_path, method: :delete
