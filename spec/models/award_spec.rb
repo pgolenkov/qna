@@ -2,6 +2,9 @@ require 'rails_helper'
 
 RSpec.describe Award, type: :model do
   it { should belong_to :question }
+  it { should have_one(:user_award).dependent(:destroy) }
+  it { should have_one(:user).through(:user_award) }
+
   it { should validate_presence_of :name }
 
   it { is_expected.to validate_attached_of(:image) }

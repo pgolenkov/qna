@@ -37,6 +37,23 @@ RSpec.describe Answer, type: :model do
     it 'should not reset best attribute for answers of other question' do
       expect(other_question_best_answer.reload).to be_best
     end
+
+    context 'when question has an award' do
+      let!(:award) { create :award, question: question }
+      before { answers.second.best! }
+
+      it 'should give award to the user of the best answer' do
+        expect(answers.second.user.awards).to eq [award]
+      end
+
+      context 'when another user has award of this question' do
+        it 'should take away award from another user' do
+          expect(answers.second.user.awards).to eq [award]
+          answers.first.best!
+          expect(answers.second.user.awards.reload).to eq []
+        end
+      end
+    end
   end
 
   it 'have many attached files' do

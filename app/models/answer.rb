@@ -13,6 +13,7 @@ class Answer < ApplicationRecord
     transaction do
       question.answers.update_all(best: false)
       update!(best: true)
+      question.award.user = user if question.award
     end
   end
 end
