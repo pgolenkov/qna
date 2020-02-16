@@ -7,5 +7,17 @@
   = f.text_area :body
   = f.label :files
   = f.file_field :files, multiple: true, direct_upload: true
+  .award
+    h3 Award for the best answer 
+    = f.fields_for :award, question.build_award do |award_f|
+      .field
+        = award_f.label :name
+        br
+        = award_f.text_field :name
+      .field
+        = award_f.label :image
+        br
+        = award_f.file_field :image, direct_upload: true
+
   = render 'links/links_form', f: f
   = f.submit 'Ask'

@@ -28,7 +28,7 @@ class QuestionsController < ApplicationController
   private
 
   def question_params
-    params.require(:question).permit(:title, :body, links_attributes: [:name, :url], files: [])
+    params.require(:question).permit(:title, :body, links_attributes: [:name, :url], award_attributes: [:name, :image], files: [])
   end
 
   def answer

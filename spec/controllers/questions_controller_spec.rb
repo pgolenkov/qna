@@ -65,6 +65,37 @@ RSpec.describe QuestionsController, type: :controller do
         end
       end
 
+      context 'with award' do
+        context 'where award is valid' do
+          it 'should add award to question' do
+            post :create, params: { question: { title: 'Title', body: 'Body', award_attributes: { name: 'Award name', image: fixture_file_upload('public/apple-touch-icon.png') } } }
+            expect(Question.last.award.name).to eq 'Award name'
+            expect(Question.last.award.image).to be_attached
+            expect(Question.last.award.image.filename.to_s).to eq 'apple-touch-icon.png'
+          end
+        end
+        context 'where award is not valid' do
+          subject do
+            post :create, params: { question: { title: 'Title', body: 'Body', award_attributes: { name: 'Award name', image: fixture_file_upload('spec/spec_helper.rb') } } }
+          end
+
+          it 'should not create new question' do
+            expect { subject }.not_to change { Question.count }
+          end
+          it { should render_template(:new) }
+        end
+
+        context 'where award name is blank' do
+          subject! do
+            post :create, params: { question: { title: 'Title', body: 'Body', award_attributes: { name: ' ', image: fixture_file_upload('public/apple-touch-icon.png') } } }
+          end
+          it 'should create new question without award' do
+            expect(Question.last.award).to be_nil
+          end
+          it { should redirect_to(question_path(Question.last)) }
+        end
+      end
+
       context 'with invalid params' do
         subject { post :create, params: { question: attributes_for(:question, :invalid) } }
         it 'should not create new question' do
