@@ -6,6 +6,7 @@ RSpec.describe AnswersController, type: :controller do
 
   describe 'POST #create' do
     subject { post :create, params: { question_id: question.id, answer: attributes_for(:answer) }, format: :js }
+    let(:last_answer) { Answer.order(:created_at).last }
 
     describe 'by authenticated user' do
       before { login(user) }
@@ -20,7 +21,7 @@ RSpec.describe AnswersController, type: :controller do
       context 'with attached files' do
         it 'should attach files to answer' do
           post :create, params: { question_id: question.id, answer: { body: 'Body', files: [fixture_file_upload('spec/spec_helper.rb')]}, format: :js }
-          expect(Answer.last.files).to be_attached
+          expect(last_answer.files).to be_attached
         end
       end
 
@@ -28,8 +29,8 @@ RSpec.describe AnswersController, type: :controller do
         context 'where links is valid' do
           it 'should add links to answer' do
             post :create, params: { question_id: question.id, answer: { body: 'Body', links_attributes: { 0 => { name: 'Google', url: 'https://google.com' }, 1 => { name: 'Yandex', url: 'https://yandex.ru' } } }, format: :js }
-            expect(Answer.last.links.pluck(:name).sort).to eq ['Google', 'Yandex']
-            expect(Answer.last.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
+            expect(last_answer.links.pluck(:name).sort).to eq ['Google', 'Yandex']
+            expect(last_answer.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
           end
         end
         context 'where links is not valid' do

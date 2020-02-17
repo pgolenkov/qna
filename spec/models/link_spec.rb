@@ -6,8 +6,8 @@ RSpec.describe Link, type: :model do
   it { should validate_presence_of :url }
   it { is_expected.to validate_url_of(:url) }
 
-  let(:question) { create :question }
-  let(:link) { create :link, linkable: question }
+  let(:question) { build :question }
+  let(:link) { build :link, linkable: question }
   let(:gist_url) { 'https://gist.github.com/pashex/9b698d35948fe219a6d7441450053624' }
 
   describe '#gist?' do

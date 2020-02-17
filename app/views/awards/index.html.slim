@@ -1,11 +1,4 @@
 - if @awards.empty?
   h3 You haven't any awards yet
 
-- @awards.each do |award|
-  .award
-    .award-question-title
-      = award.question.title
-    .award-name
-      = award.name
-    .award-image
-      = image_tag award.image
+= render @awards

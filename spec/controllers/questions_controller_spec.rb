@@ -21,6 +21,7 @@ RSpec.describe QuestionsController, type: :controller do
 
   describe 'POST #create' do
     subject { post :create, params: { question: attributes_for(:question) } }
+    let(:last_question) { Question.order(:created_at).last }
 
     describe 'by authenticated user' do
       before { login(user) }
@@ -31,17 +32,18 @@ RSpec.describe QuestionsController, type: :controller do
         end
         describe do
           before { subject }
+
           it 'should set questions user attribute to current user' do
-            expect(Question.last.user).to eq user
+            expect(last_question.user).to eq user
           end
-          it { should redirect_to(question_path(Question.last)) }
+          it { should redirect_to(question_path(last_question)) }
         end
       end
 
       context 'with attached files' do
         it 'should attach files to question' do
           post :create, params: { question: { title: 'Title', body: 'Body', files: [fixture_file_upload('spec/spec_helper.rb')]} }
-          expect(Question.last.files).to be_attached
+          expect(last_question.files).to be_attached
         end
       end
 
@@ -49,8 +51,8 @@ RSpec.describe QuestionsController, type: :controller do
         context 'where links is valid' do
           it 'should add links to question' do
             post :create, params: { question: { title: 'Title', body: 'Body', links_attributes: { 0 => { name: 'Google', url: 'https://google.com' }, 1 => { name: 'Yandex', url: 'https://yandex.ru' } } } }
-            expect(Question.last.links.pluck(:name).sort).to eq ['Google', 'Yandex']
-            expect(Question.last.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
+            expect(last_question.links.pluck(:name).sort).to eq ['Google', 'Yandex']
+            expect(last_question.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
           end
         end
         context 'where links is not valid' do
@@ -69,9 +71,9 @@ RSpec.describe QuestionsController, type: :controller do
         context 'where award is valid' do
           it 'should add award to question' do
             post :create, params: { question: { title: 'Title', body: 'Body', award_attributes: { name: 'Award name', image: fixture_file_upload('public/apple-touch-icon.png') } } }
-            expect(Question.last.award.name).to eq 'Award name'
-            expect(Question.last.award.image).to be_attached
-            expect(Question.last.award.image.filename.to_s).to eq 'apple-touch-icon.png'
+            expect(last_question.award.name).to eq 'Award name'
+            expect(last_question.award.image).to be_attached
+            expect(last_question.award.image.filename.to_s).to eq 'apple-touch-icon.png'
           end
         end
         context 'where award is not valid' do
@@ -90,9 +92,9 @@ RSpec.describe QuestionsController, type: :controller do
             post :create, params: { question: { title: 'Title', body: 'Body', award_attributes: { name: ' ', image: fixture_file_upload('public/apple-touch-icon.png') } } }
           end
           it 'should create new question without award' do
-            expect(Question.last.award).to be_nil
+            expect(last_question.award).to be_nil
           end
-          it { should redirect_to(question_path(Question.last)) }
+          it { should redirect_to(question_path(last_question)) }
         end
       end
 
