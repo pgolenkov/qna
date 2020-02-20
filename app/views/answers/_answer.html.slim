@@ -6,6 +6,7 @@ div id="answer-#{answer.id}"
   - if answer.files.attached?
     = render partial: 'attachments/attachment', collection: answer.files
 
+  = render 'votes/rating', votable: answer
   - if signed_in? && !current_user.author?(answer)
     = render 'votes/vote', votable: answer
 

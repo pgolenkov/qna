@@ -4,4 +4,8 @@ module Votable
   included do
     has_many :votes, as: :votable, dependent: :destroy
   end
+
+  def rating
+    votes.like.count - votes.dislike.count
+  end
 end

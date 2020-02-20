@@ -17,8 +17,11 @@ RSpec.describe VotesController, type: :controller do
         it 'should return vote in json with created status' do
           subject
           expect(response).to have_http_status(:created)
-          vote = JSON.parse(response.body)['vote']
+          json_response = JSON.parse(response.body)
+          vote = json_response['vote']
+          rating = json_response['rating']
           expect(vote['status']).to eq 'like'
+          expect(rating).to be_present
         end
       end
 
@@ -76,12 +79,15 @@ RSpec.describe VotesController, type: :controller do
         it 'should destroy vote' do
           expect { subject }.to change { question.votes.count }.by(-1)
         end
-        it 'should return vote with votable information and ok status' do
+        it 'should return vote with votable information, rating and ok status' do
           subject
           expect(response).to have_http_status(:ok)
-          vote_json = JSON.parse(response.body)['vote']
+          json_response = JSON.parse(response.body)
+          vote_json = json_response['vote']
+          rating = json_response['rating']
           expect(vote_json['votable_type']).to eq vote.votable_type
           expect(vote_json['votable_id']).to eq vote.votable_id
+          expect(rating).to be_present
         end
       end
 

@@ -18,25 +18,45 @@ feature 'Authenticated user can add vote to the question', %q{
         visit question_path(question)
       end
 
-      scenario 'as like' do
-        within ".question" do
-          expect(page).to have_link 'Like'
-          expect(page).to have_link 'Dislike'
-          click_on 'Like'
-          expect(page).to have_no_link 'Like'
-          expect(page).to have_no_link 'Dislike'
-          expect(page).to have_content 'You like it!'
+      describe 'as like' do
+        scenario 'and view string you like it instead vote links' do
+          within ".question" do
+            expect(page).to have_link 'Like'
+            expect(page).to have_link 'Dislike'
+            click_on 'Like'
+            expect(page).to have_no_link 'Like'
+            expect(page).to have_no_link 'Dislike'
+            expect(page).to have_content 'You like it!'
+          end
+        end
+
+        scenario 'and view the rating change' do
+          within ".question" do
+            expect(page).to have_content 'Rating: 0'
+            click_on 'Like'
+            expect(page).to have_content 'Rating: 1'
+          end
         end
       end
 
-      scenario 'as dislike' do
-        within ".question" do
-          expect(page).to have_link 'Like'
-          expect(page).to have_link 'Dislike'
-          click_on 'Dislike'
-          expect(page).to have_no_link 'Like'
-          expect(page).to have_no_link 'Dislike'
-          expect(page).to have_content 'You dislike it!'
+      describe 'as dislike' do
+        scenario 'and view string you dislike it instead vote links' do
+          within ".question" do
+            expect(page).to have_link 'Like'
+            expect(page).to have_link 'Dislike'
+            click_on 'Dislike'
+            expect(page).to have_no_link 'Like'
+            expect(page).to have_no_link 'Dislike'
+            expect(page).to have_content 'You dislike it!'
+          end
+        end
+
+        scenario 'and view the rating change' do
+          within ".question" do
+            expect(page).to have_content 'Rating: 0'
+            click_on 'Dislike'
+            expect(page).to have_content 'Rating: -1'
+          end
         end
       end
     end

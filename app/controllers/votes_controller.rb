@@ -7,7 +7,7 @@ class VotesController < ApplicationController
     respond_to do |format|
       if vote.save
         format.json do
-          render json: { vote: vote }, status: :created
+          render json: { vote: vote, rating: @votable.rating }, status: :created
         end
       else
         format.json do
@@ -22,7 +22,7 @@ class VotesController < ApplicationController
     respond_to do |format|
       if vote.user_id == current_user.id
         vote.destroy!
-        format.json { render json: { vote: vote }, status: :ok }
+        format.json { render json: { vote: vote, rating: vote.votable.rating }, status: :ok }
       else
         format.json { head :forbidden }
       end

@@ -8,6 +8,7 @@
 - if question.files.attached?
   = render partial: 'attachments/attachment', collection: question.files
 
+= render 'votes/rating', votable: question
 - if signed_in? && !current_user.author?(question)
   = render 'votes/vote', votable: question
 
