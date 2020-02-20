@@ -2,6 +2,7 @@
   - vote = votable.votes.find_by(user: current_user)
   - if vote
     = vote.like? ? 'You like it!' : 'You dislike it!'
+    = link_to 'Cancel', vote_path(vote), remote: true, method: :delete, data: { type: :json }, class: "cancel-vote-link"
   - else
     = vote_link('Like', votable, :like)
     = vote_link('Dislike', votable, :dislike)
