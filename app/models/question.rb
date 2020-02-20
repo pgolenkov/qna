@@ -1,5 +1,6 @@
 class Question < ApplicationRecord
   include Linkable
+  include Votable
 
   has_many :answers, -> { order(best: :desc) }, dependent: :destroy
   has_one :award, dependent: :destroy

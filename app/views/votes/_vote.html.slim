@@ -1,0 +1,7 @@
+.vote
+  - vote = votable.votes.find_by(user: current_user)
+  - if vote
+    = vote.like? ? 'You like it!' : 'You dislike it!'
+  - else
+    = vote_link('Like', votable, :like)
+    = vote_link('Dislike', votable, :dislike)
