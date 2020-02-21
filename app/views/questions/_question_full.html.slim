@@ -10,7 +10,7 @@
 
 = render 'votes/rating', votable: question
 - if signed_in? && !current_user.author?(question)
-  = render 'votes/vote', votable: question
+  = render 'votes/vote', vote: question.vote_of(current_user), votable: question
 
 - if question.award.present?
   .question-award

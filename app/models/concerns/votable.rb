@@ -6,6 +6,10 @@ module Votable
   end
 
   def rating
-    votes.like.count - votes.dislike.count
+    votes.sum(:status)
+  end
+
+  def vote_of(user)
+    votes.find_by(user: user)
   end
 end

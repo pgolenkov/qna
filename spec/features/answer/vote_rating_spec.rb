@@ -19,13 +19,13 @@ feature 'Guest can view vote rating of answer', %q{
   end
 
   describe 'When there are some votes for answer' do
-    given!(:like_votes) { create_list :vote, 4, :like, votable: answer }
+    given!(:like_votes) { create_list :vote, 2, :like, votable: answer }
     given!(:dislike_votes) { create_list :vote, 1, :dislike, votable: answer }
 
     scenario 'User view right rating of answer' do
       visit question_path(answer.question)
       within "#answer-#{answer.id}" do
-        expect(page).to have_content 'Rating: 3'
+        expect(page).to have_content 'Rating: 1'
       end
     end
   end
