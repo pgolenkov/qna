@@ -37,6 +37,8 @@ gem 'jbuilder', '~> 2.5'
 gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'slim-rails'
+gem 'skim'
+gem 'gon'
 gem 'decent_exposure', '3.0.0'
 
 gem 'devise'
@@ -74,6 +76,7 @@ group :test do
   gem 'chromedriver-helper'
   gem 'shoulda-matchers'
   gem 'rails-controller-testing'
+  gem 'action-cable-testing'
   gem 'launchy'
 end
 

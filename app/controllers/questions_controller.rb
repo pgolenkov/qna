@@ -1,6 +1,7 @@
 class QuestionsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :check_author, only: :update
+  after_action :publish_question, only: :create
 
   expose :questions, ->{ Question.all }
   expose :question, scope: :with_attached_files, build: ->(params, scope){ current_user.questions.build(params) }
@@ -38,5 +39,11 @@ class QuestionsController < ApplicationController
 
   def check_author
     head(:forbidden) unless current_user.author?(question)
+  end
+
+  def publish_question
+    return if question.errors.any?
+
+    ActionCable.server.broadcast('questions', question)
   end
 end

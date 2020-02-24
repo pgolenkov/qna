@@ -38,6 +38,10 @@ RSpec.describe QuestionsController, type: :controller do
           end
           it { should redirect_to(question_path(last_question)) }
         end
+
+        it 'should broadcast new question to channel' do
+          expect { subject }.to have_broadcasted_to("questions").with(last_question)
+        end
       end
 
       context 'with attached files' do
