@@ -6,6 +6,11 @@ class QuestionsController < ApplicationController
   expose :questions, ->{ Question.all }
   expose :question, scope: :with_attached_files, build: ->(params, scope){ current_user.questions.build(params) }
 
+  def show
+    gon.question_id = question.id
+    gon.user_id = current_user.try(:id)
+  end
+
   def create
     if question.save
       redirect_to question, notice: 'Your question successfully created!'

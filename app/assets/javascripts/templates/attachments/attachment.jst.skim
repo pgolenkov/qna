@@ -1,0 +1,4 @@
+.attached-file id="file-#{@id}"
+  a href="#{@url}" = @filename
+  - if gon.user_id && gon_user_id == @user_id
+    a href="/attachments/#{@id}" data-method="delete" data-remote="true" Delete

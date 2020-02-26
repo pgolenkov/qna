@@ -4,4 +4,4 @@ App.questions = App.cable.subscriptions.create "QuestionsChannel",
   disconnected: ->
 
   received: (data) ->
-    $(".questions").append JST["templates/question"](data)
+    $(".questions").append App.utils.render("question", data)

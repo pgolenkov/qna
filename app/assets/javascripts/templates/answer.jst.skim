@@ -1,0 +1,26 @@
+div id="answer-#{@id}"
+  = @body
+  / .answer-links
+  /   - for link in @links
+  /     == App.utils.render('links/link', link)
+  /
+  /   - for attachment in @attachments
+  /     == App.utils.render('attachments/attachment', attachment)
+
+  / == App.utils.render('votes/rating', votable: @)
+  / - if gon.user_id && @user_id != gon.user_id
+  /   == App.utils.render('votes/vote', votable: @, votable_type: 'answers')
+
+  .best-answer
+    - if @best
+      = 'The best answer'
+
+  .make-best-answer
+    - if gon.user_id && @user_id == gon.user_id
+      a href="/answers/#{@id}/make_best" data-method="patch" data-remote="true" Mark as the best
+
+  - if gon.user_id && @user_id == gon.user_id
+    a.edit-answer-link data-answer-id="#{@id}" Edit answer
+    a href="/answers/#{@id}" data-method="delete" data-remote="true" Delete answer
+
+    //= App.utils.render('answers/form', @)

@@ -1,6 +1,7 @@
 class AnswersController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :check_author, only: [:update, :destroy]
+  after_action :publish_answer, only: :create
 
   expose :question, id: :question_id
   expose :answers, parent: :question
@@ -35,5 +36,11 @@ class AnswersController < ApplicationController
 
   def check_author
     head(:forbidden) unless current_user.author?(answer)
+  end
+
+  def publish_answer
+    return if answer.errors.any?
+
+    ActionCable.server.broadcast("answers-#{answer.question_id}", answer)
   end
 end

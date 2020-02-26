@@ -16,6 +16,10 @@ RSpec.describe AnswersController, type: :controller do
           expect { subject }.to change { question.answers.count }.by(1)
         end
         it { should render_template(:create) }
+
+        it 'should broadcast new answer to channel' do
+          expect { subject }.to have_broadcasted_to("answers-#{question.id}").with(last_answer)
+        end
       end
 
       context 'with attached files' do

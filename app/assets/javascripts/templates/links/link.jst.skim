@@ -1,0 +1,9 @@
+.link id="link-#{@id}"
+  - if @gist
+    .gist
+      = @gist_raw
+  - else
+    a href="#{@url}" target="_blank" = @name
+
+  - if gon.user_id && @user_id == gon.user_id
+    a href="/links/#{@id}" data-method="delete" data-remote="true" Delete

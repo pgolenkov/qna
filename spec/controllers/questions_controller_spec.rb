@@ -184,11 +184,17 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'GET #show' do
+    include_context :gon
+
     let(:question) { create :question, user: user }
     before { get :show, params: { id: question } }
 
     it 'should render show' do
       expect(response).to render_template :show
+    end
+
+    it 'should set gon question id' do
+      expect(gon['question_id']).to eq question.id
     end
   end
 
