@@ -32,3 +32,5 @@ div id="answer-#{answer.id}"
       = f.file_field :files, multiple: true, direct_upload: true
       = render 'links/links_form', f: f
       = f.submit 'Save'
+
+  = render "comments/comments", commentable: answer

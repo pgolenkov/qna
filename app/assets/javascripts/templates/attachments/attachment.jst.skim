@@ -1,2 +1,2 @@
-.attached-file id="file-#{@file.id}"
-  a href="#{@file.url}" = @file.filename
+.attached-file id="file-#{@id}"
+  a href="#{@url}" = @filename

@@ -1,0 +1,8 @@
+div id="#{@commentable_type}-#{@commentable.id}-comments"
+  h2 Comments
+  .comments-list
+    - @commentable.comments.forEach (comment, index) ->
+      == App.utils.render('comments/comment', comment)
+
+  - if gon.user_id
+    == App.utils.render('comments/form', commentable_type: @commentable_type, commentable: @commentable)

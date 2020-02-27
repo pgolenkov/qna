@@ -2,6 +2,7 @@ class Answer < ApplicationRecord
   include Attachable
   include Linkable
   include Votable
+  include Commentable
 
   belongs_to :question
   belongs_to :user
@@ -22,6 +23,7 @@ class Answer < ApplicationRecord
       methods: [:rating, :files_as_json],
       include: [
         :question,
+        :comments,
         links: { methods: [:gist_raw] }
       ]
     )

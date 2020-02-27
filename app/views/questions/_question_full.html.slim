@@ -1,3 +1,4 @@
+h2 Question
 .question-title
   = question.title
 .question-body
@@ -21,6 +22,7 @@ div id="votable-question-#{question.id}"
 
 - if current_user&.author?(question)
   = link_to 'Edit question', '#', class: 'edit-question-link'
+  = link_to 'Delete question', question, method: :delete
 
   .question-errors
 
@@ -33,3 +35,5 @@ div id="votable-question-#{question.id}"
     = f.file_field :files, multiple: true, direct_upload: true
     = render 'links/links_form', f: f
     = f.submit 'Save'
+
+= render "comments/comments", commentable: question

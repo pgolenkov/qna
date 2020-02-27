@@ -25,7 +25,7 @@ feature 'User can edit answer for question', %q{
 
         expect(page).not_to have_content answer.body
         expect(page).to have_content 'Edited answer'
-        expect(page).to have_no_selector 'textarea'
+        expect(page).to have_no_selector 'textarea#answer-body'
       end
     end
 
