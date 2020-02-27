@@ -1,4 +1,5 @@
 class Question < ApplicationRecord
+  include Attachable
   include Linkable
   include Votable
 
@@ -6,7 +7,6 @@ class Question < ApplicationRecord
   has_one :award, dependent: :destroy
   belongs_to :user
 
-  has_many_attached :files
   accepts_nested_attributes_for :award, reject_if: proc { |attributes| attributes['name'].blank? }
 
   validates :title, :body, presence: true

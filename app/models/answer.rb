@@ -1,11 +1,10 @@
 class Answer < ApplicationRecord
+  include Attachable
   include Linkable
   include Votable
 
   belongs_to :question
   belongs_to :user
-
-  has_many_attached :files
 
   validates :body, presence: true
   validates :question_id, uniqueness: { scope: :best }, if: :best?
@@ -16,5 +15,15 @@ class Answer < ApplicationRecord
       update!(best: true)
       question.award&.update!(user: user)
     end
+  end
+
+  def as_json(options = nil)
+    super(
+      methods: [:rating, :files_as_json],
+      include: [
+        :question,
+        links: { methods: [:gist_raw] }
+      ]
+    )
   end
 end

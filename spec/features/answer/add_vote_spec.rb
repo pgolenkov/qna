@@ -8,6 +8,7 @@ feature 'Authenticated user can add vote to the answer', %q{
 
   given(:user) { create :user }
   given(:answer) { create :answer }
+  given(:other_answer) { create :answer, question: answer.question }
   given(:user_answer) { create :answer, user: user }
 
   describe 'Authenticated user', js: true do
@@ -27,6 +28,22 @@ feature 'Authenticated user can add vote to the answer', %q{
             expect(page).to have_no_link 'Like'
             expect(page).to have_no_link 'Dislike'
             expect(page).to have_content 'You like it!'
+          end
+        end
+
+        scenario 'and do not view string you like it for other answers of question' do
+          visit question_path(other_answer.question)
+          
+          within "#answer-#{answer.id}" do
+            expect(page).to have_link 'Like'
+            expect(page).to have_link 'Dislike'
+            click_on 'Like'
+          end
+
+          within "#answer-#{other_answer.id}" do
+            expect(page).to have_link 'Like'
+            expect(page).to have_link 'Dislike'
+            expect(page).to have_no_content 'You like it!'
           end
         end
 

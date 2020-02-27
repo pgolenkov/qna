@@ -6,9 +6,10 @@ div id="answer-#{answer.id}"
   - if answer.files.attached?
     = render partial: 'attachments/attachment', collection: answer.files
 
-  = render 'votes/rating', votable: answer
-  - if signed_in? && !current_user.author?(answer)
-    = render 'votes/vote', vote: answer.vote_of(current_user), votable: answer
+  div id="votable-answer-#{answer.id}"
+    = render 'votes/rating', votable: answer
+    - if signed_in? && !current_user.author?(answer)
+      = render 'votes/vote', vote: answer.vote_of(current_user), votable: answer
 
   .best-answer
     = 'The best answer' if answer.best?

@@ -1,3 +1,3 @@
 .vote
-  a data-type='json' class='vote-link' data-remote='true' data-method='post' href="/votes?status=like&amp;votable_id=#{@id}&amp;votable_type=#{@votable_type}" Like
-  a data-type='json' class='vote-link' data-remote='true' data-method='post' href="/votes?status=dislike&amp;votable_id=#{@id}&amp;votable_type=#{@votable_type}" Dislike
+  a data-type='json' class='vote-link' data-remote='true' data-method='post' href="/votes?status=like&votable_id=#{@votable.id}&votable_type=#{@votable_type}" Like
+  a data-type='json' class='vote-link' data-remote='true' data-method='post' href="/votes?status=dislike&votable_id=#{@votable.id}&votable_type=#{@votable_type}" Dislike
