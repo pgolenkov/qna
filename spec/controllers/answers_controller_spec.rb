@@ -45,6 +45,11 @@ RSpec.describe AnswersController, type: :controller do
           it 'should not create new answer' do
             expect { subject }.not_to change { Answer.count }
           end
+
+          it 'should not broadcast to channel' do
+            expect { subject }.not_to have_broadcasted_to("answers-#{question.id}")
+          end
+
           it { should render_template(:create) }
         end
       end
@@ -56,6 +61,10 @@ RSpec.describe AnswersController, type: :controller do
           expect { subject }.not_to change { Answer.count }
         end
 
+        it 'should not broadcast to channel' do
+          expect { subject }.not_to have_broadcasted_to("answers-#{question.id}")
+        end
+
         it { should render_template(:create) }
       end
     end
@@ -64,6 +73,11 @@ RSpec.describe AnswersController, type: :controller do
       it 'should not create new answer' do
         expect { subject }.not_to change { Answer.count }
       end
+
+      it 'should not broadcast to channel' do
+        expect { subject }.not_to have_broadcasted_to("answers-#{question.id}")
+      end
+      
       it 'should return unauthorized status' do
         subject
         expect(response).to have_http_status(:unauthorized)

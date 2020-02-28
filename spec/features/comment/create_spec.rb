@@ -8,8 +8,7 @@ feature 'User can create comment for question or answer', %q{
 
   given(:user) { create :user }
   given(:question) { create :question }
-  given(:answer) { create :answer, question: question }
-  given(:other_answer) { create :answer, question: question }
+  given(:other_question) { create :question }
 
   describe 'Authenticated user' do
     background { login(user) }
@@ -37,6 +36,10 @@ feature 'User can create comment for question or answer', %q{
           visit question_path(question)
         end
 
+        Capybara.using_session('other_question') do
+          visit question_path(other_question)
+        end
+
         Capybara.using_session('user') do
           within "#question-#{question.id}-comments" do
             fill_in 'New comment', with: 'Text of comment'
@@ -49,13 +52,20 @@ feature 'User can create comment for question or answer', %q{
             expect(page).to have_content 'Text of comment'
           end
         end
+
+        Capybara.using_session('other_question') do
+          within "#question-#{other_question.id}-comments" do
+            expect(page).not_to have_content 'Text of comment'
+          end
+        end
       end
     end
 
     describe 'for answer' do
+      given!(:answer) { create :answer, question: question }
+      given!(:other_answer) { create :answer, question: question }
+
       background do
-        answer
-        other_answer
         visit question_path(question)
       end
 

@@ -67,6 +67,11 @@ RSpec.describe QuestionsController, type: :controller do
           it 'should not create new question' do
             expect { subject }.not_to change { Question.count }
           end
+
+          it 'should not broadcast to channel' do
+            expect { subject }.not_to have_broadcasted_to("questions")
+          end
+
           it { should render_template(:new) }
         end
       end
@@ -88,6 +93,11 @@ RSpec.describe QuestionsController, type: :controller do
           it 'should not create new question' do
             expect { subject }.not_to change { Question.count }
           end
+
+          it 'should not broadcast to channel' do
+            expect { subject }.not_to have_broadcasted_to("questions")
+          end
+
           it { should render_template(:new) }
         end
 
@@ -107,6 +117,11 @@ RSpec.describe QuestionsController, type: :controller do
         it 'should not create new question' do
           expect { subject }.not_to change { Question.count }
         end
+
+        it 'should not broadcast to channel' do
+          expect { subject }.not_to have_broadcasted_to("questions")
+        end
+
         it { should render_template(:new) }
       end
     end
@@ -115,6 +130,11 @@ RSpec.describe QuestionsController, type: :controller do
       it 'should not create new question' do
         expect { subject }.not_to change { Question.count }
       end
+
+      it 'should not broadcast to channel' do
+        expect { subject }.not_to have_broadcasted_to("questions")
+      end
+      
       it { should redirect_to(new_user_session_path) }
     end
   end

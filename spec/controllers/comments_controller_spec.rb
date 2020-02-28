@@ -32,6 +32,10 @@ RSpec.describe CommentsController, type: :controller do
             expect { subject }.not_to change { Comment.count }
           end
 
+          it 'should not broadcast new comment to channel' do
+            expect { subject }.not_to have_broadcasted_to("comments-#{question.id}")
+          end
+
           it { should render_template(:create) }
         end
       end
@@ -40,6 +44,11 @@ RSpec.describe CommentsController, type: :controller do
         it 'should not create new comment' do
           expect { subject }.not_to change { Comment.count }
         end
+
+        it 'should not broadcast new comment to channel' do
+          expect { subject }.not_to have_broadcasted_to("comments-#{question.id}")
+        end
+
         it 'should return unauthorized status' do
           subject
           expect(response).to have_http_status(:unauthorized)
@@ -73,6 +82,10 @@ RSpec.describe CommentsController, type: :controller do
             expect { subject }.not_to change { Comment.count }
           end
 
+          it 'should not broadcast new comment to channel' do
+            expect { subject }.not_to have_broadcasted_to("comments-#{answer.question_id}")
+          end
+
           it { should render_template(:create) }
         end
       end
@@ -81,6 +94,11 @@ RSpec.describe CommentsController, type: :controller do
         it 'should not create new comment' do
           expect { subject }.not_to change { Comment.count }
         end
+
+        it 'should not broadcast new comment to channel' do
+          expect { subject }.not_to have_broadcasted_to("comments-#{answer.question_id}")
+        end
+        
         it 'should return unauthorized status' do
           subject
           expect(response).to have_http_status(:unauthorized)
