@@ -8,11 +8,11 @@ div id="answer-#{@id}"
     == App.utils.render('attachments/attachment', file)
 
   == App.utils.render('votes/rating', votable: @)
-  - if gon.user_id && @user_id != gon.user_id
+  - if gon.user_id && @user_id isnt gon.user_id
     == App.utils.render('votes/vote', votable: @, votable_type: 'answers')
 
   .make-best-answer
-    - if gon.user_id && gon.user_id == @question.user_id
+    - if gon.user_id && gon.user_id is @question.user_id
       a href="/answers/#{@id}/make_best" data-method="patch" data-remote="true" Mark as the best
 
   == App.utils.render('comments/comments', commentable: @, commentable_type: 'answer')
