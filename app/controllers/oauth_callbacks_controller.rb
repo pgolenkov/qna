@@ -3,6 +3,7 @@ class OauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.find_for_oauth(request.env['omniauth.auth'])
     if @user&.persisted?
       sign_in_and_redirect @user, event: :authentication
+      set_flash_message(:notice, :success, kind: 'Github')
     else
       redirect_to root_path, alert: 'Authentication failed'
     end

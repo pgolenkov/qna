@@ -12,15 +12,15 @@ feature 'User can sign in with omniuath',%q{
     it "user can sign in with Github account" do
       mock_auth_hash
       click_on "Sign in with GitHub"
-      expect(page).to have_content('Signed in successfully')
+      expect(page).to have_content('Successfully authenticated from Github account')
       expect(page).to have_content("mockuser@email.com")
       expect(page).to have_content("Log out")
     end
 
     it "can handle authentication error" do
-      OmniAuth.config.mock_auth[:guthub] = :invalid_credentials
+      OmniAuth.config.mock_auth[:github] = :invalid_credentials
       click_on "Sign in with GitHub"
-      expect(page).to have_content('Authentication failed')
+      expect(page).to have_content('Could not authenticate you from GitHub')
     end
   end
 
