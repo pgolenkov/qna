@@ -12,19 +12,8 @@ class User < ApplicationRecord
 
   has_many :awards
 
-  def self.find_for_oauth(data)
-    authorization = Authorization.find_by(provider: data.provider, uid: data.uid.to_s)
-    return authorization.user if authorization
-
-    email = data.info.email
-    user = User.find_by(email: email)
-    unless user
-      password = Devise.friendly_token[0, 20]
-      user = User.create!(email: email, password: password, password_confirmation: password)
-    end
-
-    user.authorizations.create!(provider: data.provider, uid: data.uid.to_s)
-    user
+  def self.find_for_oauth(auth)
+    Services::FindForOauth.new(auth).call
   end
 
   def author?(record)
