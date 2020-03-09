@@ -12,10 +12,6 @@ class User < ApplicationRecord
 
   has_many :awards
 
-  def self.find_for_oauth(auth)
-    Services::FindForOauth.new(auth).call
-  end
-
   def author?(record)
     record.user_id == id
   end

@@ -5,11 +5,15 @@ RSpec.describe OauthCallbacksController, type: :controller do
 
   describe 'GET #github' do
     let(:oauth_data) { { provider: 'github', uid: '12345' } }
+    let(:service) { double('Services::FindForOauth') }
+
+    before { allow(Services::FindForOauth).to receive(:new).and_return(service) }
 
     it 'finds user from oauth data' do
       allow(request.env).to receive(:[]).and_call_original
       allow(request.env).to receive(:[]).with('omniauth.auth').and_return(oauth_data)
-      expect(User).to receive(:find_for_oauth).with(oauth_data)
+      expect(Services::FindForOauth).to receive(:new).with(oauth_data).and_return(service)
+      expect(service).to receive(:call)
       get :github
     end
 
@@ -17,7 +21,7 @@ RSpec.describe OauthCallbacksController, type: :controller do
       let!(:user) { create :user }
 
       before do
-        allow(User).to receive(:find_for_oauth).and_return(user)
+        allow(service).to receive(:call).and_return(user)
         get :github
       end
 
@@ -32,7 +36,7 @@ RSpec.describe OauthCallbacksController, type: :controller do
 
     context 'user not exist' do
       before do
-        allow(User).to receive(:find_for_oauth)
+        allow(service).to receive(:call)
         get :github
       end
 
@@ -49,7 +53,7 @@ RSpec.describe OauthCallbacksController, type: :controller do
       let!(:user) { build :user }
 
       before do
-        allow(User).to receive(:find_for_oauth).and_return(user)
+        allow(service).to receive(:call).and_return(user)
         get :github
       end
 
