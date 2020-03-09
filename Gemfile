@@ -44,6 +44,7 @@ gem 'decent_exposure', '3.0.0'
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-github'
+gem 'omniauth-vkontakte'
 
 gem 'jquery-rails'
 

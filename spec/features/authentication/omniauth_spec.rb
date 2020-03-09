@@ -18,9 +18,26 @@ feature 'User can sign in with omniuath',%q{
     end
 
     it "can handle authentication error" do
+      mock_auth_hash
       OmniAuth.config.mock_auth[:github] = :invalid_credentials
       click_on "Sign in with GitHub"
       expect(page).to have_content('Could not authenticate you from GitHub')
+    end
+  end
+
+  describe "Sign in with VK" do
+    it "user can sign in with VK account" do
+      mock_auth_hash
+      click_on "Sign in with Vkontakte"
+      expect(page).to have_content('Successfully authenticated from Vkontakte account')
+      expect(page).to have_content("mockuser@email.com")
+      expect(page).to have_content("Log out")
+    end
+
+    it "can handle authentication error" do
+      OmniAuth.config.mock_auth[:vkontakte] = :invalid_credentials
+      click_on "Sign in with Vkontakte"
+      expect(page).to have_content('Could not authenticate you from Vkontakte')
     end
   end
 
