@@ -39,31 +39,70 @@ RSpec.describe Services::FindForOauth do
     end
 
     context 'user does not exist' do
-      let(:auth) { base_auth.merge(info: { email: 'newuser@email.com' }) }
+      context 'when auth has email' do
+        let(:auth) { base_auth.merge(info: { email: 'newuser@email.com' }) }
 
-      it 'does create new user' do
-        expect { subject.call }.to change(User, :count).by(1)
+        it 'does create new user' do
+          expect { subject.call }.to change(User, :count).by(1)
+        end
+
+        it 'returns new user' do
+          expect(subject.call).to be_a(User)
+        end
+
+        it 'returns confirmed user' do
+          expect(subject.call).to be_confirmed
+        end
+
+        it 'fills email for new user' do
+          expect(subject.call.email).to eq auth.info.email
+        end
+
+        it 'should create authorization for user' do
+          user = subject.call
+          expect(user.authorizations).not_to be_empty
+        end
+
+        it 'should create authorization with provider and uid' do
+          user = subject.call
+          last_authorization = user.authorizations.order(:id).last
+          expect(last_authorization.provider).to eq auth.provider
+          expect(last_authorization.uid).to eq auth.uid
+        end
       end
 
-      it 'returns new user' do
-        expect(subject.call).to be_a(User)
+      context 'when auth has no email' do
+        let(:auth) { base_auth.merge(info: { }) }
+
+        it 'does create new user' do
+          expect { subject.call }.to change(User, :count).by(1)
+        end
+
+        it 'returns new user' do
+          expect(subject.call).to be_a(User)
+        end
+
+        it 'returns unconfirmed user' do
+          expect(subject.call).not_to be_confirmed
+        end
+
+        it 'should return invalid user without email' do
+          expect(subject.call.email).not_to be_present
+        end
+
+        it 'should create authorization for user' do
+          user = subject.call
+          expect(user.authorizations).not_to be_empty
+        end
+
+        it 'should create authorization with provider and uid' do
+          user = subject.call
+          last_authorization = user.authorizations.order(:id).last
+          expect(last_authorization.provider).to eq auth.provider
+          expect(last_authorization.uid).to eq auth.uid
+        end
       end
 
-      it 'fills email for new user' do
-        expect(subject.call.email).to eq auth.info.email
-      end
-
-      it 'should create authorization for user' do
-        user = subject.call
-        expect(user.authorizations).not_to be_empty
-      end
-
-      it 'should create authorization with provider and uid' do
-        user = subject.call
-        last_authorization = user.authorizations.order(:id).last
-        expect(last_authorization.provider).to eq auth.provider
-        expect(last_authorization.uid).to eq auth.uid
-      end
     end
   end
 

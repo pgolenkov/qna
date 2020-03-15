@@ -81,7 +81,7 @@ RSpec.describe OauthCallbacksController, type: :controller do
       get :vkontakte
     end
 
-    context 'user exists' do
+    context 'user exists and valid' do
       let!(:user) { create :user }
 
       before do
@@ -95,6 +95,25 @@ RSpec.describe OauthCallbacksController, type: :controller do
 
       it 'redirects to root path' do
         expect(response).to redirect_to root_path
+      end
+    end
+
+    context 'user has empty email' do
+      let!(:user) { build :user, :empty_email }
+
+      before do
+        user.save!(validate: false)
+        user.authorizations.create!(provider: 'vkontakte', uid: '12345')
+        allow(service).to receive(:call).and_return(user)
+        get :vkontakte
+      end
+
+      it 'does not login user' do
+        expect(subject.current_user).to_not be
+      end
+
+      it 'redirects to edit user path' do
+        expect(response).to redirect_to edit_user_path(provider: 'vkontakte', uid: '12345')
       end
     end
 

@@ -11,6 +11,11 @@ class OauthCallbacksController < Devise::OmniauthCallbacksController
 
   def vkontakte
     @user = Services::FindForOauth.new(request.env['omniauth.auth']).call
+    if @user && @user.email.blank?
+      authorization = @user.authorizations.find_by!(provider: 'vkontakte')
+      return redirect_to edit_user_path(provider: 'vkontakte', uid: authorization.uid)
+    end
+
     if @user&.persisted?
       sign_in_and_redirect @user, event: :authentication
       set_flash_message(:notice, :success, kind: 'Vkontakte')
