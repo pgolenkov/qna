@@ -11,6 +11,7 @@ require 'active_storage_validations/matchers'
 require "action_cable/testing/rspec"
 require 'webdrivers'
 require 'webdrivers/chromedriver'
+require 'capybara/email/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
