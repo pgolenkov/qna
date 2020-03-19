@@ -99,11 +99,14 @@ RSpec.describe OauthCallbacksController, type: :controller do
     end
 
     context 'user has empty email' do
-      let!(:user) { build :user, :empty_email }
+      let!(:user) do
+        build(:user, email: '').tap do |u|
+          u.save!(validate: false)
+          u.authorizations.create!(provider: 'vkontakte', uid: '12345')
+        end
+      end
 
       before do
-        user.save!(validate: false)
-        user.authorizations.create!(provider: 'vkontakte', uid: '12345')
         allow(service).to receive(:call).and_return(user)
         get :vkontakte
       end

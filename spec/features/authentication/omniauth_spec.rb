@@ -1,17 +1,16 @@
 require 'rails_helper'
 
-feature 'User can sign in with omniuath',%q{
+feature 'User can sign in with omniauth',%q{
   In order to ask questions
   As an unauthenticated user
   I'd like to be able to sign in with omniauth
 } do
 
-  background do
-    mock_auth_hash
-    visit new_user_session_path
-  end
+  background { visit new_user_session_path }
 
   describe "Sign in with Github" do
+    background { mock_auth_hash(:github) }
+
     scenario "user can sign in with Github account" do
       click_on "Sign in with GitHub"
       expect(page).to have_content('Successfully authenticated from Github account')
@@ -27,6 +26,8 @@ feature 'User can sign in with omniuath',%q{
   end
 
   describe "Sign in with VK" do
+    background { mock_auth_hash(:vkontakte) }
+
     context 'when VK account has email' do
       scenario "user can sign in with VK account" do
         click_on "Sign in with Vkontakte"
@@ -122,7 +123,6 @@ feature 'User can sign in with omniuath',%q{
         end
       end
     end
-
   end
 
 end

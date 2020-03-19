@@ -9,10 +9,18 @@ RSpec.describe Services::FindForOauth do
   context 'user already has authorization' do
     let(:auth) { base_auth }
 
-    before { user.authorizations.create(provider: auth.provider, uid: auth.uid) }
+    before { user.authorizations.create!(provider: auth.provider, uid: auth.uid) }
 
     it 'returns the user' do
       expect(subject.call).to eq user
+    end
+
+    it 'does not create new user' do
+      expect { subject.call }.not_to change(User, :count)
+    end
+
+    it 'should not create new authorization' do
+      expect { subject.call }.not_to change(Authorization, :count)
     end
   end
 
@@ -23,12 +31,14 @@ RSpec.describe Services::FindForOauth do
       it 'does not create new user' do
         expect { subject.call }.not_to change(User, :count)
       end
+
       it 'should create authorization for user' do
-        expect { subject.call }.to change(user.authorizations, :count).by(1)
+        expect { subject.call }.to change(Authorization, :count).by(1)
       end
+
       it 'should create authorization with provider and uid' do
         user = subject.call
-        last_authorization = user.authorizations.order(:id).last
+        last_authorization = user.authorizations.order(:created_at).last
         expect(last_authorization.provider).to eq auth.provider
         expect(last_authorization.uid).to eq auth.uid
       end
@@ -60,12 +70,12 @@ RSpec.describe Services::FindForOauth do
 
         it 'should create authorization for user' do
           user = subject.call
-          expect(user.authorizations).not_to be_empty
+          expect(user.authorizations.count).to eq 1
         end
 
         it 'should create authorization with provider and uid' do
           user = subject.call
-          last_authorization = user.authorizations.order(:id).last
+          last_authorization = user.authorizations.order(:created_at).last
           expect(last_authorization.provider).to eq auth.provider
           expect(last_authorization.uid).to eq auth.uid
         end
@@ -92,18 +102,16 @@ RSpec.describe Services::FindForOauth do
 
         it 'should create authorization for user' do
           user = subject.call
-          expect(user.authorizations).not_to be_empty
+          expect(user.authorizations.count).to eq 1
         end
 
         it 'should create authorization with provider and uid' do
           user = subject.call
-          last_authorization = user.authorizations.order(:id).last
+          last_authorization = user.authorizations.order(:created_at).last
           expect(last_authorization.provider).to eq auth.provider
           expect(last_authorization.uid).to eq auth.uid
         end
       end
-
     end
   end
-
 end

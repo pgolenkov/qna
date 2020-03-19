@@ -8,9 +8,5 @@ FactoryBot.define do
     trait(:not_confirmed) do
       confirmed_at { nil }
     end
-
-    trait(:empty_email) do
-      email { '' }
-    end
   end
 end
