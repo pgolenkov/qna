@@ -10,9 +10,7 @@ class Services::FindForOauth
     return authorization.user if authorization
 
     email = auth.info.email || ''
-    if email.present?
-      user = User.find_by(email: email)
-    end
+    user = User.find_by(email: email) if email.present?
 
     User.transaction do
       unless user
