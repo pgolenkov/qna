@@ -7,6 +7,8 @@ class AnswersController < ApplicationController
   expose :answers, parent: :question
   expose :answer, scope: :with_attached_files, build: ->(params, scope){ current_user.answers.where(question: question).build(params) }
 
+  authorize_resource
+
   def create
     answer.save
   end

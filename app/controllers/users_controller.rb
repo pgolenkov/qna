@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :find_user_by_provider_and_uid
+  skip_authorization_check
 
   def edit
   end

@@ -2,6 +2,8 @@ class VotesController < ApplicationController
   before_action :authenticate_user!
   before_action :find_votable, only: :create
 
+  authorize_resource
+
   def create
     vote = @votable.votes.build(user: current_user, status: params[:status])
     if vote.save

@@ -45,6 +45,7 @@ gem 'devise'
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-vkontakte'
+gem 'cancancan'
 
 gem 'jquery-rails'
 
