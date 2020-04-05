@@ -11,8 +11,4 @@ class User < ApplicationRecord
   has_many :authorizations, dependent: :destroy
 
   has_many :awards
-
-  def author?(record)
-    record.user_id == id
-  end
 end

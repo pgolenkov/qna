@@ -134,7 +134,7 @@ RSpec.describe QuestionsController, type: :controller do
       it 'should not broadcast to channel' do
         expect { subject }.not_to have_broadcasted_to("questions")
       end
-      
+
       it { should redirect_to(new_user_session_path) }
     end
   end
@@ -243,7 +243,9 @@ RSpec.describe QuestionsController, type: :controller do
           expect(Question).to exist(another_question.id)
         end
 
-        it { should redirect_to(questions_path) }
+        it 'should return forbidden status' do
+          expect(response).to have_http_status(:forbidden)
+        end
       end
     end
 

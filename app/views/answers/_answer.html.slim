@@ -8,18 +8,19 @@ div id="answer-#{answer.id}"
 
   div id="votable-answer-#{answer.id}"
     = render 'votes/rating', votable: answer
-    - if signed_in? && !current_user.author?(answer)
+    - if signed_in? && can?(:create_vote, answer)
       = render 'votes/vote', vote: answer.vote_of(current_user), votable: answer
 
   .best-answer
     = 'The best answer' if answer.best?
 
   .make-best-answer
-    - if !answer.best? && current_user&.author?(answer.question)
+    - if !answer.best? && can?(:make_best, answer)
       = link_to 'Mark as the best', make_best_answer_path(answer), method: :patch, remote: true
 
-  - if current_user&.author?(answer)
+  - if can?(:update, answer)
     = link_to 'Edit answer', '#', class: 'edit-answer-link', data: { answer_id: answer.id }
+  - if can?(:destroy, answer)
     = link_to 'Delete answer', answer, method: :delete, remote: true
 
     .update-answer-errors

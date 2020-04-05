@@ -29,7 +29,6 @@ RSpec.describe Ability do
       it { should be_able_to :create, Question }
       it { should be_able_to :create, Answer }
       it { should be_able_to :create, Comment }
-      it { should be_able_to :create, Vote }
     end
 
     describe 'update abilities' do
@@ -68,10 +67,16 @@ RSpec.describe Ability do
       it { should_not be_able_to :destroy, create(:vote) }
     end
 
-    describe 'make best answer abilities' do
+    describe 'other abilities' do
       it { should be_able_to :make_best, create(:answer, question: user_question) }
       it { should_not be_able_to :make_best, create(:answer, question: other_question) }
       it { should_not be_able_to :make_best, create(:answer, user: user, question: other_question) }
+
+      it { should be_able_to :create_vote, other_question }
+      it { should_not be_able_to :create_vote, user_question }
+
+      it { should be_able_to :create_vote, other_answer }
+      it { should_not be_able_to :create_vote, user_answer }
     end
   end
 

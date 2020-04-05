@@ -1,6 +1,4 @@
 class OauthCallbacksController < Devise::OmniauthCallbacksController
-  skip_authorization_check
-
   def github
     @user = Services::FindForOauth.new(request.env['omniauth.auth']).call
     if @user&.persisted?
