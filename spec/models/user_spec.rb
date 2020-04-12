@@ -6,6 +6,10 @@ RSpec.describe User, type: :model do
   it { should have_many(:comments).dependent(:destroy) }
   it { should have_many(:authorizations).dependent(:destroy) }
   it { should have_many(:awards) }
+  it { should have_many(:access_grants).class_name('Doorkeeper::AccessGrant')
+         .with_foreign_key(:resource_owner_id).dependent(:destroy) }
+  it { should have_many(:access_tokens).class_name('Doorkeeper::AccessToken')
+         .with_foreign_key(:resource_owner_id).dependent(:destroy) }
 
   it { should validate_presence_of :email }
   it { should validate_presence_of :password }

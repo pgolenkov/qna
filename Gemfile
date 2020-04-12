@@ -46,6 +46,7 @@ gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-vkontakte'
 gem 'cancancan'
+gem 'doorkeeper'
 
 gem 'jquery-rails'
 
