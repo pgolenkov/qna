@@ -15,6 +15,14 @@ Rails.application.routes.draw do
   resources :awards, only: :index
   resource :user, only: [:edit, :update]
 
+  namespace :api do
+    namespace :v1 do
+      resources :profiles, only: [] do
+        get :me, on: :collection
+      end
+    end
+  end
+
   root to: "questions#index"
 
   mount ActionCable.server => '/cable'
