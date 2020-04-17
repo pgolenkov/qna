@@ -42,6 +42,7 @@ RSpec.configure do |config|
   config.include FeatureHelpers, type: :feature
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include ControllerHelpers, type: :controller
+  config.include ApiHelpers, type: :request
   config.include ActiveStorageValidations::Matchers
   config.include OmniauthMacros
 
