@@ -56,6 +56,8 @@ gem "cocoon"
 gem "validate_url"
 gem "httparty"
 gem 'active_storage_validations'
+gem 'active_model_serializers', '~> 0.10'
+gem 'oj'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
