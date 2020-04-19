@@ -5,29 +5,19 @@ describe 'Profiles API', type: :request do
                     'ACCEPT' => 'application/json' } }
 
   describe 'GET /api/v1/profiles/me' do
-    context 'unauthorized' do
-      it 'returns unauthorized status if no access_token' do
-        get '/api/v1/profiles/me', headers: headers
-        expect(response).to be_unauthorized
-      end
+    let(:api_path) { '/api/v1/profiles/me' }
+    let(:me) { create :user }
+    let(:access_token) { create :access_token, resource_owner_id: me.id }
 
-      it 'returns unauthorized status if access_token is invalid' do
-        get '/api/v1/profiles/me', params: { access_token: '1234' }, headers: headers
-        expect(response).to be_unauthorized
-      end
+    it_behaves_like 'API authorizable' do
+      let(:method) { :get }
     end
 
     context 'authorized' do
-      let(:me) { create :user }
-      let(:access_token) { create :access_token, resource_owner_id: me.id }
       let(:user_json) { json['user'] }
 
       before do
-        get '/api/v1/profiles/me', params: { access_token: access_token.token }, headers: headers
-      end
-
-      it 'returns successful status' do
-        expect(response).to be_successful
+        get api_path, params: { access_token: access_token.token }, headers: headers
       end
 
       it 'returns public fields of user' do
