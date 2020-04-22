@@ -1,47 +1,47 @@
 require 'rails_helper'
 
-describe 'Questions API', type: :request do
+describe 'Answers API', type: :request do
   let(:headers) { { 'CONTENT-TYPE' => 'application/json',
                     'ACCEPT' => 'application/json' } }
 
-  describe 'GET /api/v1/questions' do
-    let(:api_path) { '/api/v1/questions' }
+  describe 'GET /api/v1/questions/:id/answers' do
+    let(:question) { create :question }
+    let(:api_path) { "/api/v1/questions/#{question.id}/answers" }
     let(:access_token) { create :access_token }
-    let!(:questions) { create_list :question, 2 }
+    let!(:answers) { create_list :answer, 2, question: question }
 
     it_behaves_like 'API authorizable' do
       let(:method) { :get }
     end
 
     context 'authorized' do
-      let(:question) { questions.first }
-      let(:questions_json) { json['questions'] }
-      let(:question_json) { questions_json.first }
+      let(:answers_json) { json['answers'] }
 
       before do
         get api_path, params: { access_token: access_token.token }, headers: headers
       end
 
-      it 'returns list of questions' do
-        expect(questions_json.size).to eq questions.size
+      it 'returns list of answers of question' do
+        expect(answers_json.size).to eq answers.size
       end
 
-      it 'returns attributes of question' do
-        %w[id title body created_at updated_at].each do |attr|
-          expect(question_json[attr]).to eq question.send(attr).as_json
+      it 'returns attributes of each answer and user' do
+        answers.each do |answer|
+          answer_json = answers_json.find { |a| a['id'] == answer.id }
+          %w[body rating best? created_at updated_at].each do |attr|
+            expect(answer_json[attr]).to eq answer.send(attr).as_json
+          end
+
+          expect(answer_json['user']['id']).to eq answer.user.id
+          expect(answer_json['user']['email']).to eq answer.user.email
         end
-      end
-
-      it 'returns owner of question as an user' do
-        expect(question_json['user']['id']).to eq question.user.id
-        expect(question_json['user']['email']).to eq question.user.email
       end
     end
   end
 
-  describe 'GET /api/v1/questions/:id' do
-    let(:question) { create :question }
-    let(:api_path) { "/api/v1/questions/#{question.id}" }
+  describe 'GET /api/v1/answers/:id' do
+    let(:answer) { create :answer }
+    let(:api_path) { "/api/v1/answers/#{answer.id}" }
     let(:access_token) { create :access_token }
 
     it_behaves_like 'API authorizable' do
@@ -50,30 +50,30 @@ describe 'Questions API', type: :request do
 
     context 'authorized' do
       subject { get api_path, params: { access_token: access_token.token }, headers: headers }
-      let(:question_json) { json['question'] }
+      let(:answer_json) { json['answer'] }
 
-      it 'returns attributes of question' do
+      it 'returns attributes of answer' do
         subject
-        %w[id title body created_at updated_at].each do |attr|
-          expect(question_json[attr]).to eq question.send(attr).as_json
+        %w[body rating best? created_at updated_at].each do |attr|
+          expect(answer_json[attr]).to eq answer.send(attr).as_json
         end
       end
 
-      it 'returns owner of question as an user' do
+      it 'returns owner of answer as an user' do
         subject
-        expect(question_json['user']['id']).to eq question.user.id
-        expect(question_json['user']['email']).to eq question.user.email
+        expect(answer_json['user']['id']).to eq answer.user.id
+        expect(answer_json['user']['email']).to eq answer.user.email
       end
 
-      context 'question has any comments' do
-        let!(:comments) { create_list :comment, 2, commentable: question }
+      context 'answer has any comments' do
+        let!(:comments) { create_list :comment, 2, commentable: answer }
         let(:comment) { comments.first }
-        let(:comments_json) { question_json['comments'] }
+        let(:comments_json) { answer_json['comments'] }
         let(:comment_json) { comments_json.first }
 
         before { subject }
 
-        it 'returns list of comments of question' do
+        it 'returns list of comments of answer' do
           expect(comments_json.size).to eq comments.size
         end
 
@@ -89,13 +89,13 @@ describe 'Questions API', type: :request do
         end
       end
 
-      context 'question has any links' do
-        let!(:links) { create_list :link, 2, linkable: question }
-        let(:links_json) { question_json['links'] }
+      context 'answer has any links' do
+        let!(:links) { create_list :link, 2, linkable: answer }
+        let(:links_json) { answer_json['links'] }
 
         before { subject }
 
-        it 'returns list of links of question' do
+        it 'returns list of links of answer' do
           expect(links_json.size).to eq links.size
         end
 
@@ -109,12 +109,12 @@ describe 'Questions API', type: :request do
         end
       end
 
-      context 'question has any attached files' do
+      context 'answer has any attached files' do
         let(:filenames) { ['spec_helper.rb', 'rails_helper.rb']}
-        let(:files_json) { question_json['files'] }
+        let(:files_json) { answer_json['files'] }
 
         before do
-          question.update(files: filenames.map { |filename| fixture_file_upload("spec/#{filename}") })
+          answer.update(files: filenames.map { |filename| fixture_file_upload("spec/#{filename}") })
           subject
         end
 
