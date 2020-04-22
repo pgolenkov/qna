@@ -85,9 +85,7 @@ describe 'Questions API', type: :request do
 
       context 'question has any links' do
         let!(:links) { create_list :link, 2, linkable: question }
-        let(:link) { links.sort_by(&:id).first }
         let(:links_json) { question_json['links'] }
-        let(:link_json) { links_json.sort_by { |l| l['id'] }.first }
 
         before { subject }
 
@@ -96,8 +94,11 @@ describe 'Questions API', type: :request do
         end
 
         it 'returns attributes of each link' do
-          %w[id name url created_at updated_at].each do |attr|
-            expect(link_json[attr]).to eq link.send(attr).as_json
+          links.each do |link|
+            link_json = links_json.find { |l| l['id'] == link.id }
+            %w[id name url gist? gist_raw created_at updated_at].each do |attr|
+              expect(link_json[attr]).to eq link.send(attr).as_json
+            end
           end
         end
       end
