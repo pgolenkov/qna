@@ -103,7 +103,26 @@ describe 'Questions API', type: :request do
         end
       end
 
-      it 'returns list of urls of attached files of question'
+      context 'question has any attached files' do
+        let(:filenames) { ['spec_helper.rb', 'rails_helper.rb']}
+        let(:files_json) { question_json['files'] }
+
+        before do
+          question.update(files: filenames.map { |filename| fixture_file_upload("spec/#{filename}") })
+          subject
+        end
+
+        it 'returns list of of attached files of question' do
+          expect(files_json.size).to eq filenames.size
+        end
+
+        it 'returns attributes of each file' do
+          filenames.each do |filename|
+            file_json = files_json.find { |f| f['filename'] == filename }
+            expect(file_json['url']).to include filename
+          end
+        end
+      end
     end
   end
 end
