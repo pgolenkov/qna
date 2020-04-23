@@ -1,10 +1,11 @@
 class Api::V1::QuestionsController < Api::V1::BaseController
+  load_and_authorize_resource
+
   def index
     render json: Question.all
   end
 
   def show
-    @question = Question.find(params[:id])
     render json: @question, serializer: QuestionFullSerializer
   end
 
@@ -12,6 +13,14 @@ class Api::V1::QuestionsController < Api::V1::BaseController
     @question = current_resource_owner.questions.build(question_params)
     if @question.save
       render json: @question, serializer: QuestionFullSerializer, status: :created
+    else
+      render json: { errors: @question.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def update
+    if @question.update(question_params)
+      render json: @question, serializer: QuestionFullSerializer
     else
       render json: { errors: @question.errors.full_messages }, status: :unprocessable_entity
     end

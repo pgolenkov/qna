@@ -251,4 +251,81 @@ describe 'Questions API', type: :request do
       end
     end
   end
+
+  describe 'PATCH /api/v1/questions/:id' do
+    let(:api_path) { "/api/v1/questions/#{question.id}" }
+    let(:access_token) { create :access_token }
+    let(:user) { User.find(access_token.resource_owner_id) }
+    let(:question) { create :question, user: user }
+
+    let(:params) { { id: question, question: { title: 'Edited title', body: 'Edited body'} } }
+
+    it_behaves_like 'API authorizable' do
+      let(:method) { :patch }
+    end
+
+    context 'authorized' do
+      subject { patch api_path, params: params.merge(access_token: access_token.token), headers: headers }
+
+      let(:question_json) { json['question'] }
+
+      context 'resource owner is an owner of question' do
+        before { subject }
+
+        context 'with valid params' do
+          it 'should change question' do
+            expect(question.reload.title).to eq 'Edited title'
+            expect(question.body).to eq 'Edited body'
+          end
+
+          it 'returns edited attributes of question' do
+            question.reload
+            %w[id title body created_at updated_at].each do |attr|
+              expect(question_json[attr]).to eq question.send(attr).as_json
+            end
+          end
+        end
+
+        context 'with invalid params' do
+          let(:params) { { id: question, question: { title: ' ', body: 'Edited body'} } }
+
+          it 'should not change question' do
+            expect { subject }.to_not change(question, :title)
+            expect { subject }.to_not change(question, :body)
+          end
+
+          it 'returns unprocessable entity status' do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'returns errors in json' do
+            subject
+            expect(json['errors']).to be_present
+            expect(json['errors'].first).to eq "Title can't be blank"
+          end
+        end
+      end
+
+      context 'resource owner is not an owner of question' do
+        let(:question) { create :question }
+
+        it 'should not change question' do
+          expect { subject }.to_not change(question, :title)
+          expect { subject }.to_not change(question, :body)
+        end
+
+        it 'should return forbidden status' do
+          subject
+          expect(response).to have_http_status(:forbidden)
+        end
+
+        it 'returns empty response' do
+          subject
+          expect(response.body).to be_empty
+        end
+      end
+    end
+  end
+
 end
