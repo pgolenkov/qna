@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 describe 'Questions API', type: :request do
-  let(:headers) { { 'CONTENT-TYPE' => 'application/json',
-                    'ACCEPT' => 'application/json' } }
+  let(:headers) { { 'ACCEPT' => 'application/json' } }
 
   describe 'GET /api/v1/questions' do
     let(:api_path) { '/api/v1/questions' }
@@ -127,6 +126,127 @@ describe 'Questions API', type: :request do
             file_json = files_json.find { |f| f['filename'] == filename }
             expect(file_json['url']).to include filename
           end
+        end
+      end
+    end
+  end
+
+  describe 'POST /api/v1/questions' do
+    let(:api_path) { "/api/v1/questions" }
+    let(:access_token) { create :access_token }
+    let(:params) { { question: attributes_for(:question) } }
+
+    it_behaves_like 'API authorizable' do
+      let(:method) { :post }
+    end
+
+    context 'authorized' do
+      let(:last_question) { Question.order(:created_at).last }
+      let(:user) { User.find(access_token.resource_owner_id) }
+      let(:question_json) { json['question'] }
+
+      subject { post api_path, params: params.merge(access_token: access_token.token), headers: headers }
+
+      context 'with valid params' do
+        it 'should create new question' do
+          expect { subject }.to change { Question.count }.by(1)
+        end
+
+        it 'should set questions user attribute to resource owner' do
+          subject
+          expect(last_question.user).to eq user
+        end
+
+        it 'returns attributes of question' do
+          subject
+          %w[id title body created_at updated_at].each do |attr|
+            expect(question_json[attr]).to eq last_question.send(attr).as_json
+          end
+        end
+
+        it 'returns owner of question as an user' do
+          subject
+          expect(question_json['user']['id']).to eq user.id
+          expect(question_json['user']['email']).to eq user.email
+        end
+
+        it 'should broadcast new question to channel' do
+          expect { subject }.to have_broadcasted_to("questions").with(last_question)
+        end
+      end
+
+      context 'with links' do
+        let(:params) { { question: attributes_for(:question).merge(links_attributes) } }
+        let(:links_json) { question_json['links'] }
+
+        context 'where links is valid' do
+          let(:links_attributes) do
+             { links_attributes: { 0 => { name: 'Google', url: 'https://google.com' }, 1 => { name: 'Yandex', url: 'https://yandex.ru' } } }
+          end
+
+          before { subject }
+
+          it 'should add links to question' do
+            expect(last_question.links.pluck(:name).sort).to eq ['Google', 'Yandex']
+            expect(last_question.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
+          end
+
+          it 'returns list of links of question' do
+            expect(links_json.size).to eq 2
+          end
+
+          it 'returns attributes of each link' do
+            expect(links_json.map { |l| l['name'] }.sort).to eq ['Google', 'Yandex']
+            expect(links_json.map { |l| l['url'] }.sort).to eq ['https://google.com', 'https://yandex.ru']
+          end
+        end
+
+        context 'where links is not valid' do
+          let(:links_attributes) do
+            { links_attributes: { 0 => { url: 'https://google.com' } } }
+          end
+
+          it 'should not create new question' do
+            expect { subject }.not_to change { Question.count }
+          end
+
+          it 'should not broadcast to channel' do
+            expect { subject }.not_to have_broadcasted_to("questions")
+          end
+
+          it 'returns unprocessable entity status' do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'returns errors in json' do
+            subject
+            expect(json['errors']).to be_present
+            expect(json['errors'].first).to eq "Links name can't be blank"
+          end
+        end
+      end
+
+      context 'with invalid params' do
+        let(:params) { { question: attributes_for(:question, :invalid) } }
+
+        it 'should not create new question' do
+          expect { subject }.not_to change { Question.count }
+        end
+
+        it 'should not broadcast to channel' do
+          expect { subject }.not_to have_broadcasted_to("questions")
+        end
+
+        it 'returns unprocessable entity status' do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns errors in json' do
+          subject
+          expect(json['errors']).to be_present
+          expect(json['errors'].first).to eq "Title can't be blank"
         end
       end
     end

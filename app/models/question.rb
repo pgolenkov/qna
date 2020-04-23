@@ -8,6 +8,8 @@ class Question < ApplicationRecord
   has_one :award, dependent: :destroy
   belongs_to :user
 
+  after_commit :publish, on: :create
+
   accepts_nested_attributes_for :award, reject_if: proc { |attributes| attributes['name'].blank? }
 
   validates :title, :body, presence: true
@@ -15,5 +17,13 @@ class Question < ApplicationRecord
 
   def best_answer
     answers.find_by(best: true)
+  end
+
+  private
+
+  def publish
+    return if self.errors.any?
+
+    ActionCable.server.broadcast('questions', self)
   end
 end
