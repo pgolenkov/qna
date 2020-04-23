@@ -258,7 +258,7 @@ describe 'Questions API', type: :request do
     let(:user) { User.find(access_token.resource_owner_id) }
     let(:question) { create :question, user: user }
 
-    let(:params) { { id: question, question: { title: 'Edited title', body: 'Edited body'} } }
+    let(:params) { { question: { title: 'Edited title', body: 'Edited body'} } }
 
     it_behaves_like 'API authorizable' do
       let(:method) { :patch }
@@ -287,7 +287,7 @@ describe 'Questions API', type: :request do
         end
 
         context 'with invalid params' do
-          let(:params) { { id: question, question: { title: ' ', body: 'Edited body'} } }
+          let(:params) { { question: { title: ' ', body: 'Edited body'} } }
 
           it 'should not change question' do
             expect { subject }.to_not change(question, :title)
@@ -328,4 +328,54 @@ describe 'Questions API', type: :request do
     end
   end
 
+  describe 'DELETE /api/v1/questions/:id' do
+    let(:api_path) { "/api/v1/questions/#{question.id}" }
+    let(:access_token) { create :access_token }
+    let(:user) { User.find(access_token.resource_owner_id) }
+    let!(:question) { create :question, user: user }
+
+    it_behaves_like 'API authorizable' do
+      let(:method) { :delete }
+    end
+
+    context 'authorized' do
+      subject { delete api_path, params: { access_token: access_token.token }, headers: headers }
+
+      describe 'when resource owner is an author of question' do
+        it 'should destroy question' do
+          expect { subject }.to change { Question.count }.by(-1)
+          expect(Question).not_to exist(question.id)
+        end
+
+        it 'should return no content status' do
+          subject
+          expect(response).to have_http_status(:no_content)
+        end
+
+        it 'returns empty response' do
+          subject
+          expect(response.body).to be_empty
+        end
+      end
+
+      describe 'when resource owner is not an author of question' do
+        let!(:question) { create :question }
+
+        it 'should not destroy question' do
+          expect { subject }.not_to change { Question.count }
+          expect(Question).to exist(question.id)
+        end
+
+        it 'should return forbidden status' do
+          subject
+          expect(response).to have_http_status(:forbidden)
+        end
+
+        it 'returns empty response' do
+          subject
+          expect(response.body).to be_empty
+        end
+      end
+    end
+  end
 end

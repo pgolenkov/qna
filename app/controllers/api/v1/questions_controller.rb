@@ -26,6 +26,11 @@ class Api::V1::QuestionsController < Api::V1::BaseController
     end
   end
 
+  def destroy
+    @question.destroy
+    head :no_content
+  end
+
   private
 
   def question_params
