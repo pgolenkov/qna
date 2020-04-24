@@ -7,6 +7,8 @@ class Answer < ApplicationRecord
   belongs_to :question
   belongs_to :user
 
+  after_commit :publish, on: :create
+
   validates :body, presence: true
   validates :question_id, uniqueness: { scope: :best }, if: :best?
 
@@ -27,5 +29,13 @@ class Answer < ApplicationRecord
         links: { methods: [:gist_raw] }
       ]
     )
+  end
+
+  private
+
+  def publish
+    return if self.errors.any?
+
+    ActionCable.server.broadcast("answers-#{question_id}", self)
   end
 end

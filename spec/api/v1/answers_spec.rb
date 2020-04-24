@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 describe 'Answers API', type: :request do
-  let(:headers) { { 'CONTENT-TYPE' => 'application/json',
-                    'ACCEPT' => 'application/json' } }
+  let(:headers) { { 'ACCEPT' => 'application/json' } }
 
   describe 'GET /api/v1/questions/:id/answers' do
     let(:question) { create :question }
@@ -131,4 +130,132 @@ describe 'Answers API', type: :request do
       end
     end
   end
+
+  describe 'POST /api/v1/questions/:id/answers' do
+    let(:question) { create :question }
+    let(:api_path) { "/api/v1/questions/#{question.id}/answers" }
+    let(:access_token) { create :access_token }
+    let(:params) { { answer: attributes_for(:answer) } }
+
+    it_behaves_like 'API authorizable' do
+      let(:method) { :post }
+    end
+
+    context 'authorized' do
+      let(:last_answer) { Answer.order(:created_at).last }
+      let(:user) { User.find(access_token.resource_owner_id) }
+      let(:answer_json) { json['answer'] }
+
+      subject { post api_path, params: params.merge(access_token: access_token.token), headers: headers }
+
+      context 'with valid params' do
+        it 'should create new answer' do
+          expect { subject }.to change { Answer.count }.by(1)
+        end
+
+        it 'should create answer for question' do
+          subject
+          expect(last_answer.question).to eq question
+        end
+
+        it 'should set answer user attribute to resource owner' do
+          subject
+          expect(last_answer.user).to eq user
+        end
+
+        it 'returns attributes of answer' do
+          subject
+          %w[body rating best? created_at updated_at].each do |attr|
+            expect(answer_json[attr]).to eq last_answer.send(attr).as_json
+          end
+        end
+
+        it 'returns owner of answer as an user' do
+          subject
+          expect(answer_json['user']['id']).to eq user.id
+          expect(answer_json['user']['email']).to eq user.email
+        end
+
+        it 'should broadcast new answer to channel' do
+          expect { subject }.to have_broadcasted_to("answers-#{question.id}").with(last_answer)
+        end
+      end
+
+      context 'with links' do
+        let(:params) { { answer: attributes_for(:answer).merge(links_attributes) } }
+        let(:links_json) { answer_json['links'] }
+
+        context 'where links is valid' do
+          let(:links_attributes) do
+             { links_attributes: { 0 => { name: 'Google', url: 'https://google.com' }, 1 => { name: 'Yandex', url: 'https://yandex.ru' } } }
+          end
+
+          before { subject }
+
+          it 'should add links to answer' do
+            expect(last_answer.links.pluck(:name).sort).to eq ['Google', 'Yandex']
+            expect(last_answer.links.pluck(:url).sort).to eq ['https://google.com', 'https://yandex.ru']
+          end
+
+          it 'returns list of links of answer' do
+            expect(links_json.size).to eq 2
+          end
+
+          it 'returns attributes of each link' do
+            expect(links_json.map { |l| l['name'] }.sort).to eq ['Google', 'Yandex']
+            expect(links_json.map { |l| l['url'] }.sort).to eq ['https://google.com', 'https://yandex.ru']
+          end
+        end
+
+        context 'where links is not valid' do
+          let(:links_attributes) do
+            { links_attributes: { 0 => { url: 'https://google.com' } } }
+          end
+
+          it 'should not create new answer' do
+            expect { subject }.not_to change { Answer.count }
+          end
+
+          it 'should not broadcast to channel' do
+            expect { subject }.not_to have_broadcasted_to("answers-#{question.id}")
+          end
+
+          it 'returns unprocessable entity status' do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'returns errors in json' do
+            subject
+            expect(json['errors']).to be_present
+            expect(json['errors'].first).to eq "Links name can't be blank"
+          end
+        end
+      end
+
+      context 'with invalid params' do
+        let(:params) { { answer: attributes_for(:answer, :invalid) } }
+
+        it 'should not create new answer' do
+          expect { subject }.not_to change { Answer.count }
+        end
+
+        it 'should not broadcast to channel' do
+          expect { subject }.not_to have_broadcasted_to("answers-#{question.id}")
+        end
+
+        it 'returns unprocessable entity status' do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns errors in json' do
+          subject
+          expect(json['errors']).to be_present
+          expect(json['errors'].first).to eq "Body can't be blank"
+        end
+      end
+    end
+  end
+
 end

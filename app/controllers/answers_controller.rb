@@ -1,6 +1,5 @@
 class AnswersController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  after_action :publish_answer, only: :create
 
   expose :question, id: :question_id
   expose :answers, parent: :question
@@ -31,11 +30,5 @@ class AnswersController < ApplicationController
 
   def answer_params
     params.require(:answer).permit(:body, links_attributes: [:name, :url], files: [])
-  end
-
-  def publish_answer
-    return if answer.errors.any?
-
-    ActionCable.server.broadcast("answers-#{answer.question_id}", answer)
   end
 end
