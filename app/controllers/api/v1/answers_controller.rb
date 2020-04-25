@@ -2,28 +2,21 @@ class Api::V1::AnswersController < Api::V1::BaseController
   load_and_authorize_resource
 
   def index
-    render json: question.answers
+    render json: question.answers, each_serializer: AnswerListSerializer
   end
 
   def show
-    render json: @answer, serializer: AnswerFullSerializer
+    render json: @answer
   end
 
   def create
     @answer = current_resource_owner.answers.where(question: question).build(answer_params)
-    if @answer.save
-      render json: @answer, serializer: AnswerFullSerializer, status: :created
-    else
-      render json: { errors: @answer.errors.full_messages }, status: :unprocessable_entity
-    end
+    save_and_render(@answer, :created)
   end
 
   def update
-    if @answer.update(answer_params)
-      render json: @answer, serializer: AnswerFullSerializer
-    else
-      render json: { errors: @answer.errors.full_messages }, status: :unprocessable_entity
-    end
+    @answer.attributes = answer_params
+    save_and_render(@answer)
   end
 
   def destroy
