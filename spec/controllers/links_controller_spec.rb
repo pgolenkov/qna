@@ -6,9 +6,9 @@ RSpec.describe LinksController, type: :controller do
   describe 'DELETE #destroy' do
     context 'question link' do
       let(:question) { create :question, user: user }
-      let(:link) { create :link, linkable: question }
+      let!(:link) { create :link, linkable: question }
       let(:another_question) { create :question }
-      let(:another_question_link) { create :link, linkable: another_question }
+      let!(:another_question_link) { create :link, linkable: another_question }
 
       subject { delete :destroy, params: { id: link, format: :js } }
 
@@ -17,7 +17,7 @@ RSpec.describe LinksController, type: :controller do
 
         context 'his question' do
           it 'should remove link from question' do
-            expect(question.links).to eq [link]
+            expect(question.links.reload).to eq [link]
             subject
             expect(question.links.reload).to be_empty
           end
@@ -29,7 +29,7 @@ RSpec.describe LinksController, type: :controller do
           subject! { delete :destroy, params: { id: another_question_link, format: :js } }
 
           it 'should not remove link from question' do
-            expect(another_question.links).to eq [another_question_link]
+            expect(another_question.links.reload).to eq [another_question_link]
           end
 
           it 'should return forbidden status' do
@@ -42,7 +42,7 @@ RSpec.describe LinksController, type: :controller do
         before { subject }
 
         it 'should not remove link from question' do
-          expect(question.links).to eq [link]
+          expect(question.links.reload).to eq [link]
         end
 
         it 'should return unauthorized status' do
@@ -53,9 +53,9 @@ RSpec.describe LinksController, type: :controller do
 
     context 'answer link' do
       let(:answer) { create :answer, user: user }
-      let(:link) { create :link, linkable: answer }
+      let!(:link) { create :link, linkable: answer }
       let(:another_answer) { create :answer }
-      let(:another_answer_link) { create :link, linkable: another_answer }
+      let!(:another_answer_link) { create :link, linkable: another_answer }
 
       subject { delete :destroy, params: { id: link, format: :js } }
 
@@ -64,7 +64,7 @@ RSpec.describe LinksController, type: :controller do
 
         context 'his answer' do
           it 'should remove link from answer' do
-            expect(answer.links).to eq [link]
+            expect(answer.links.reload).to eq [link]
             subject
             expect(answer.links.reload).to be_empty
           end
@@ -76,7 +76,7 @@ RSpec.describe LinksController, type: :controller do
           subject! { delete :destroy, params: { id: another_answer_link, format: :js } }
 
           it 'should not remove link from answer' do
-            expect(another_answer.links).to eq [another_answer_link]
+            expect(another_answer.links.reload).to eq [another_answer_link]
           end
 
           it 'should return forbidden status' do
@@ -89,7 +89,7 @@ RSpec.describe LinksController, type: :controller do
         before { subject }
 
         it 'should not remove link from answer' do
-          expect(answer.links).to eq [link]
+          expect(answer.links.reload).to eq [link]
         end
 
         it 'should return unauthorized status' do
