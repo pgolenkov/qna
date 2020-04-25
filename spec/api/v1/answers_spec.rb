@@ -258,4 +258,127 @@ describe 'Answers API', type: :request do
     end
   end
 
+  describe 'PATCH /api/v1/answers/:id' do
+    let(:api_path) { "/api/v1/answers/#{answer.id}" }
+    let(:access_token) { create :access_token }
+    let(:user) { User.find(access_token.resource_owner_id) }
+    let(:answer) { create :answer, user: user }
+
+    let(:params) { { answer: { body: 'Edited body'} } }
+
+    it_behaves_like 'API authorizable' do
+      let(:method) { :patch }
+    end
+
+    context 'authorized' do
+      subject { patch api_path, params: params.merge(access_token: access_token.token), headers: headers }
+
+      let(:answer_json) { json['answer'] }
+
+      context 'resource owner is an owner of answer' do
+        before { subject }
+
+        context 'with valid params' do
+          it 'should change answer' do
+            expect(answer.reload.body).to eq 'Edited body'
+          end
+
+          it 'returns edited attributes of answer' do
+            answer.reload
+            %w[id body rating best? created_at updated_at].each do |attr|
+              expect(answer_json[attr]).to eq answer.send(attr).as_json
+            end
+          end
+        end
+
+        context 'with invalid params' do
+          let(:params) { { answer: { body: ' '} } }
+
+          it 'should not change answer' do
+            expect { subject }.to_not change(answer, :body)
+          end
+
+          it 'returns unprocessable entity status' do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'returns errors in json' do
+            subject
+            expect(json['errors']).to be_present
+            expect(json['errors'].first).to eq "Body can't be blank"
+          end
+        end
+      end
+
+      context 'resource owner is not an owner of answer' do
+        let(:answer) { create :answer }
+
+        it 'should not change answer' do
+          expect { subject }.to_not change(answer, :body)
+        end
+
+        it 'should return forbidden status' do
+          subject
+          expect(response).to have_http_status(:forbidden)
+        end
+
+        it 'returns empty response' do
+          subject
+          expect(response.body).to be_empty
+        end
+      end
+    end
+  end
+
+  describe 'DELETE /api/v1/answers/:id' do
+    let(:api_path) { "/api/v1/answers/#{answer.id}" }
+    let(:access_token) { create :access_token }
+    let(:user) { User.find(access_token.resource_owner_id) }
+    let!(:answer) { create :answer, user: user }
+
+    it_behaves_like 'API authorizable' do
+      let(:method) { :delete }
+    end
+
+    context 'authorized' do
+      subject { delete api_path, params: { access_token: access_token.token }, headers: headers }
+
+      describe 'when resource owner is an author of answer' do
+        it 'should destroy answer' do
+          expect { subject }.to change { Answer.count }.by(-1)
+          expect(Answer).not_to exist(answer.id)
+        end
+
+        it 'should return no content status' do
+          subject
+          expect(response).to have_http_status(:no_content)
+        end
+
+        it 'returns empty response' do
+          subject
+          expect(response.body).to be_empty
+        end
+      end
+
+      describe 'when resource owner is not an author of answer' do
+        let!(:answer) { create :answer }
+
+        it 'should not destroy answer' do
+          expect { subject }.not_to change { Answer.count }
+          expect(Answer).to exist(answer.id)
+        end
+
+        it 'should return forbidden status' do
+          subject
+          expect(response).to have_http_status(:forbidden)
+        end
+
+        it 'returns empty response' do
+          subject
+          expect(response.body).to be_empty
+        end
+      end
+    end
+  end
 end
