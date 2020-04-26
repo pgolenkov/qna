@@ -140,66 +140,10 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'PATCH #update' do
-    let!(:question) { create :question, user: user }
-    subject { patch :update, params: { id: question, question: { title: 'Edited title', body: 'Edited body'} }, format: :js }
-
-    describe 'by authenticated user' do
-      before { login(user) }
-
-      context 'his question with valid params' do
-        it 'should change question' do
-          subject
-          expect(question.reload.title).to eq 'Edited title'
-          expect(question.body).to eq 'Edited body'
-        end
-        it { should render_template(:update) }
-      end
-
-      context 'with attached files' do
-        it 'should attach files to question' do
-          patch :update, params: { id: question, question: { files: [fixture_file_upload('spec/spec_helper.rb')] } }, format: :js
-          expect(question.reload.files).to be_attached
-        end
-      end
-
-      context 'his question with invalid params' do
-        subject { patch :update, params: { id: question, question: { title: '' } }, format: :js }
-
-        it 'should not change question' do
-          expect { subject }.to_not change(question, :title)
-        end
-
-        it { should render_template(:update) }
-      end
-
-      context "another user's question" do
-        let!(:another_question) { create :question }
-        subject { patch :update, params: { id: another_question, question: { title: 'Edited title' }, format: :js } }
-        before { subject }
-
-        it 'should not change question' do
-          expect { subject }.to_not change(another_question, :title)
-        end
-
-        it 'should return forbidden status' do
-          expect(response).to have_http_status(:forbidden)
-        end
-      end
-    end
-
-    describe 'by unauthenticated user' do
-      it 'should not change question`s title' do
-        expect { subject }.to_not change(question, :title)
-      end
-
-      it 'should not change question`s body' do
-        expect { subject }.to_not change(question, :body)
-      end
-
-      it 'should return unauthorized status' do
-        subject
-        expect(response).to have_http_status(:unauthorized)
-      end
+    it_behaves_like 'update resource' do
+      let!(:resource) { create :question, user: user }
+      let(:update_attributes) { { title: 'Edited title', body: 'Edited body'} }
+      let(:invalid_attributes) { { title: ' ', body: 'Edited body'} }
     end
   end
 

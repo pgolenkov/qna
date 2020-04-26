@@ -77,7 +77,7 @@ RSpec.describe AnswersController, type: :controller do
       it 'should not broadcast to channel' do
         expect { subject }.not_to have_broadcasted_to("answers-#{question.id}")
       end
-      
+
       it 'should return unauthorized status' do
         subject
         expect(response).to have_http_status(:unauthorized)
@@ -86,62 +86,10 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe 'PATCH #update' do
-    let!(:answer) { create :answer, question: question, user: user }
-    subject { patch :update, params: { id: answer, answer: { body: 'Edited answer'} }, format: :js }
-
-    describe 'by authenticated user' do
-      before { login(user) }
-
-      context 'his answer with valid params' do
-        it 'should change answer for question' do
-          subject
-          expect(answer.reload.body).to eq 'Edited answer'
-        end
-        it { should render_template(:update) }
-      end
-
-      context 'with attached files' do
-        it 'should attach files to answer' do
-          patch :update, params: { id: answer, answer: { files: [fixture_file_upload('spec/spec_helper.rb')] } }, format: :js
-          expect(answer.reload.files).to be_attached
-        end
-      end
-
-      context 'his answer with invalid params' do
-        subject { patch :update, params: { id: answer, answer: attributes_for(:answer, :invalid) }, format: :js }
-
-        it 'should not change answer' do
-          expect { subject }.to_not change(answer, :body)
-        end
-
-        it { should render_template(:update) }
-      end
-
-      context "another user's answer" do
-        let!(:another_answer) { create :answer }
-        subject { patch :update, params: { id: another_answer, answer: { body: 'Edited answer'} }, format: :js }
-        before { subject }
-
-        it 'should not change answer' do
-          expect { subject }.to_not change(another_answer, :body)
-        end
-
-        it 'should return forbidden status' do
-          expect(response).to have_http_status(:forbidden)
-        end
-      end
-    end
-
-    describe 'by unauthenticated user' do
-      before { subject }
-
-      it 'should not change answer' do
-        expect { subject }.to_not change(answer, :body)
-      end
-
-      it 'should return unauthorized status' do
-        expect(response).to have_http_status(:unauthorized)
-      end
+    it_behaves_like 'update resource' do
+      let!(:resource) { create :answer, question: question, user: user  }
+      let(:update_attributes) { { body: 'Edited answer'} }
+      let(:invalid_attributes) { { body: ' '} }
     end
   end
 
