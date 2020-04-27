@@ -18,7 +18,7 @@ RSpec.shared_examples 'update resource' do
     end
 
     context 'with attached files' do
-      it 'should attach files to question' do
+      it 'should attach files to resource' do
         patch :update, params: { id: resource, resource_name => { files: [fixture_file_upload('spec/spec_helper.rb')] } }, format: :js
         expect(resource.reload.files).to be_attached
       end
@@ -27,7 +27,7 @@ RSpec.shared_examples 'update resource' do
     context 'his resource with invalid params' do
       subject { patch :update, params: { id: resource, resource_name => invalid_attributes }, format: :js }
 
-      it 'should not change question' do
+      it 'should not change resource' do
         update_attributes.keys.each do |attr_name|
           expect { subject }.to_not change(resource, attr_name)
         end

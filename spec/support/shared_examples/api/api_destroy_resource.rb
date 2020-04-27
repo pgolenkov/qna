@@ -19,7 +19,7 @@ RSpec.shared_examples 'API destroy resource' do
   describe 'when API current resource owner is not an author of resource' do
     before { resource.update_column :user_id, create(:user).id }
 
-    it 'should not destroy question' do
+    it 'should not destroy resource' do
       expect { subject }.not_to change { resource_class.count }
       expect(resource_class).to exist(resource.id)
     end

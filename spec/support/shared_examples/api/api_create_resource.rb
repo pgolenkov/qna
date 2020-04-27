@@ -20,7 +20,7 @@ RSpec.shared_examples 'API create resource' do
     context 'with invalid params' do
       let(:params) { invalid_params }
 
-      it 'should not create new question' do
+      it 'should not create new resource' do
         expect { subject }.not_to change { resource_class.count }
       end
 

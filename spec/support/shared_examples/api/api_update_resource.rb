@@ -34,7 +34,7 @@ RSpec.shared_examples 'API update resource' do
     end
   end
 
-  context 'resource owner is not an owner of question' do
+  context 'resource owner is not an owner of resource' do
     before { resource.update_column :user_id, create(:user).id }
 
     it 'should not change resource' do
