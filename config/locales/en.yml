@@ -31,3 +31,7 @@
 
 en:
   hello: "Hello world"
+
+  daily_digest_mailer:
+    digest:
+      subject: Daily Digest
