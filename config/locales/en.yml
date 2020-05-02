@@ -35,3 +35,6 @@ en:
   daily_digest_mailer:
     digest:
       subject: Daily Digest
+  notification_mailer:
+    new_answer:
+      subject: New answer for question
