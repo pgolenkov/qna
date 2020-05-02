@@ -7,6 +7,7 @@ class Answer < ApplicationRecord
   belongs_to :question
   belongs_to :user
 
+  after_create :send_notification
   after_commit :publish, on: :create
 
   validates :body, presence: true
@@ -32,6 +33,10 @@ class Answer < ApplicationRecord
   end
 
   private
+
+  def send_notification
+    Services::Notification.new.new_answer(self)
+  end
 
   def publish
     return if self.errors.any?

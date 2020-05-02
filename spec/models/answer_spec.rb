@@ -60,4 +60,24 @@ RSpec.describe Answer, type: :model do
   it 'have many attached files' do
     expect(subject.files).to be_an_instance_of(ActiveStorage::Attached::Many)
   end
+
+  describe 'New answer notification' do
+    let(:answer) { build :answer }
+    let!(:persisted_answer) { create :answer }
+    let(:service) { double 'Services::Notification' }
+
+    before do
+      allow(Services::Notification).to receive(:new).and_return(service)
+    end
+
+    it 'calls Services::Notification#new_answer after create' do
+      expect(service).to receive(:new_answer).with(answer)
+      answer.save!
+    end
+
+    it 'does not call Services::Notification#new_answer after update' do
+      expect(service).not_to receive(:new_answer).with(persisted_answer)
+      persisted_answer.update!(body: 'new body')
+    end
+  end
 end
