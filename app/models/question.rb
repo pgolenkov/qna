@@ -3,11 +3,13 @@ class Question < ApplicationRecord
   include Linkable
   include Votable
   include Commentable
+  include Subscribable
 
   has_many :answers, -> { order(best: :desc) }, dependent: :destroy
   has_one :award, dependent: :destroy
   belongs_to :user
 
+  after_create :subscribe_author
   after_commit :publish, on: :create
 
   accepts_nested_attributes_for :award, reject_if: proc { |attributes| attributes['name'].blank? }
@@ -20,6 +22,10 @@ class Question < ApplicationRecord
   end
 
   private
+
+  def subscribe_author
+    self.subscriptions.create(user: user)
+  end
 
   def publish
     return if self.errors.any?

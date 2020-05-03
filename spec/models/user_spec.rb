@@ -10,6 +10,7 @@ RSpec.describe User, type: :model do
          .with_foreign_key(:resource_owner_id).dependent(:destroy) }
   it { should have_many(:access_tokens).class_name('Doorkeeper::AccessToken')
          .with_foreign_key(:resource_owner_id).dependent(:destroy) }
+  it { should have_many(:subscriptions).dependent(:destroy) }
 
   it { should validate_presence_of :email }
   it { should validate_presence_of :password }
@@ -36,6 +37,21 @@ RSpec.describe User, type: :model do
 
     it 'should return false if user is not an author of answer' do
       expect(user).not_to be_author(another_answer)
+    end
+  end
+
+  describe '#subscribed?' do
+    let(:user) { create :user }
+
+    let(:question) { create :question }
+
+    it 'should be truthy if user is subscribed to question' do
+      question.subscriptions.create!(user: user)
+      expect(user).to be_subscribed(question)
+    end
+
+    it 'should be falseyif user is not subscribed to question' do
+      expect(user).not_to be_subscribed(question)
     end
   end
 end

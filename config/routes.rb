@@ -18,7 +18,9 @@ Rails.application.routes.draw do
   resources :links, only: :destroy
   resources :votes, only: [:create, :destroy]
   resources :comments, only: :create
+  resources :subscriptions, only: :create
   resources :awards, only: :index
+
   resource :user, only: [:edit, :update]
 
   namespace :api do

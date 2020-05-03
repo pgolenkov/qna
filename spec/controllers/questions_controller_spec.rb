@@ -36,6 +36,7 @@ RSpec.describe QuestionsController, type: :controller do
           it 'should set questions user attribute to current user' do
             expect(last_question.user).to eq user
           end
+
           it { should redirect_to(question_path(last_question)) }
         end
 

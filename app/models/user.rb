@@ -22,7 +22,13 @@ class User < ApplicationRecord
            foreign_key: :resource_owner_id,
            dependent: :destroy
 
+  has_many :subscriptions, dependent: :destroy
+
   def author?(record)
     record.user_id == id
+  end
+
+  def subscribed?(record)
+    record.subscriptions.where(user_id: id).any?
   end
 end
