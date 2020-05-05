@@ -5,6 +5,11 @@ class SubscriptionsController < ApplicationController
     @subscription = current_user.subscriptions.find_or_create_by(subscribable: subscribable)
   end
 
+  def destroy
+    @subscription = current_user.subscriptions.find_by(subscribable: subscribable)
+    @subscription.destroy if @subscription
+  end
+
   private
 
   def subscribable

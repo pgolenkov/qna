@@ -15,12 +15,7 @@ div id="votable-question-#{question.id}"
     = render 'votes/vote', vote: question.vote_of(current_user), votable: question
 
 - if signed_in?
-  .subscription
-    - if current_user.subscribed?(question)
-      | You are subscribed to this question
-    - else
-      = link_to 'Subscribe', subscriptions_path(subscribable_type: 'Question', subscribable_id: question.id), method: :post, remote: true
-
+  = render 'subscriptions/subscription', subscribable: question
 
 - if question.award.present?
   .question-award
