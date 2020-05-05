@@ -19,7 +19,7 @@ RSpec.describe Services::Notification do
     context 'when there are other subscribers' do
       let(:subscribed_users) do
         create_list(:user, 2).tap do |users|
-          users.each { |user| create :subscription, subscribable: question, user: user }
+          users.each { |user| create :subscription, question: question, user: user }
         end
       end
 

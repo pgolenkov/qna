@@ -2,17 +2,17 @@ class SubscriptionsController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    @subscription = current_user.subscriptions.find_or_create_by(subscribable: subscribable)
+    @subscription = current_user.subscriptions.find_or_create_by(question: question)
   end
 
   def destroy
-    @subscription = current_user.subscriptions.find_by(subscribable: subscribable)
+    @subscription = current_user.subscriptions.find_by(question: question)
     @subscription.destroy if @subscription
   end
 
   private
 
-  def subscribable
-    @subscribable ||= params[:subscribable_type].classify.constantize.find(params[:subscribable_id])
+  def question
+    @question ||= Question.find(params[:question_id])
   end
 end

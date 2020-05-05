@@ -1,6 +1,6 @@
 .subscription
-  - if current_user.subscribed?(subscribable)
-    | You are subscribed to this #{subscribable.model_name.singular}
-    = link_to 'Unsubscribe', subscription_path(subscribable_type: subscribable.class.to_s, subscribable_id: subscribable.id), method: :delete, remote: true
+  - if current_user.subscribed?(question)
+    | You are subscribed to this question
+    = link_to 'Unsubscribe', question_subscription_path(question_id: question.id), method: :delete, remote: true
   - else
-    = link_to 'Subscribe', subscription_path(subscribable_type: subscribable.class.to_s, subscribable_id: subscribable.id), method: :post, remote: true
+    = link_to 'Subscribe', question_subscription_path(question_id: question.id), method: :post, remote: true

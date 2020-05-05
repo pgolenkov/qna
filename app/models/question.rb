@@ -3,11 +3,11 @@ class Question < ApplicationRecord
   include Linkable
   include Votable
   include Commentable
-  include Subscribable
 
   has_many :answers, -> { order(best: :desc) }, dependent: :destroy
   has_one :award, dependent: :destroy
   belongs_to :user
+  has_many :subscriptions, dependent: :destroy
 
   after_create :subscribe_author
   after_commit :publish, on: :create

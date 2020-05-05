@@ -12,13 +12,13 @@ Rails.application.routes.draw do
     resources :answers, shallow: true do
       patch :make_best, on: :member
     end
+    resource :subscription, only: [:create, :destroy]
   end
 
   resources :attachments, only: :destroy
   resources :links, only: :destroy
   resources :votes, only: [:create, :destroy]
   resources :comments, only: :create
-  resource :subscription, only: [:create, :destroy]
   resources :awards, only: :index
 
   resource :user, only: [:edit, :update]

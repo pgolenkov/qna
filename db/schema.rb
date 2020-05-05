@@ -142,12 +142,11 @@ ActiveRecord::Schema.define(version: 2020_05_03_060623) do
 
   create_table "subscriptions", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "subscribable_type"
-    t.bigint "subscribable_id"
+    t.bigint "question_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["subscribable_type", "subscribable_id"], name: "index_subscriptions_on_subscribable_type_and_subscribable_id"
-    t.index ["user_id", "subscribable_id", "subscribable_type"], name: "unique_index_on_user_id_for_subscribable", unique: true
+    t.index ["question_id"], name: "index_subscriptions_on_question_id"
+    t.index ["user_id", "question_id"], name: "index_subscriptions_on_user_id_and_question_id", unique: true
     t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
 
@@ -193,6 +192,7 @@ ActiveRecord::Schema.define(version: 2020_05_03_060623) do
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "users", column: "resource_owner_id"
   add_foreign_key "questions", "users"
+  add_foreign_key "subscriptions", "questions"
   add_foreign_key "subscriptions", "users"
   add_foreign_key "votes", "users"
 end

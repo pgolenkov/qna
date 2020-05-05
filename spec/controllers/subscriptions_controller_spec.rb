@@ -4,7 +4,7 @@ RSpec.describe SubscriptionsController, type: :controller do
   describe 'POST #create' do
     let!(:question) { create :question }
 
-    subject { post :create, params: { subscribable_type: 'Question', subscribable_id: question.id }, format: :js }
+    subject { post :create, params: { question_id: question }, format: :js }
 
     context 'for authenticated user' do
       let(:user) { create :user }
@@ -47,7 +47,7 @@ RSpec.describe SubscriptionsController, type: :controller do
   describe 'DELETE #destroy' do
     let!(:question) { create :question }
 
-    subject { delete :destroy, params: { subscribable_type: 'Question', subscribable_id: question.id }, format: :js }
+    subject { delete :destroy, params: { question_id: question.id }, format: :js }
 
     context 'for authenticated user' do
       let(:user) { create :user }
