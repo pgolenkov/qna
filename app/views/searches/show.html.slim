@@ -1,0 +1,10 @@
+= form_with url: search_path, method: :get, local: true do |f|
+  = f.label :query
+  = f.text_field :query
+  = f.submit 'Search'
+
+- if @questions.any?
+  h2 Results
+  = render @questions
+- else
+  h2 No questions found

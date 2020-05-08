@@ -23,6 +23,8 @@ Rails.application.routes.draw do
 
   resource :user, only: [:edit, :update]
 
+  resource :search, only: [:show]
+
   namespace :api do
     namespace :v1 do
       resources :profiles, only: [:index] do

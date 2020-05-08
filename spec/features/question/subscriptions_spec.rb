@@ -6,7 +6,7 @@ feature 'User can subscribe the question', %q{
   I'd like to be able to subscribe/unsubscribe the question
 } do
 
-  given(:question) { create :question }
+  given!(:question) { create :question }
 
   describe 'Authenticated user' do
     given(:user) { create :user }
