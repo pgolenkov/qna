@@ -4,76 +4,106 @@ feature 'User can search the question', %q{
   In order to find needed question
   As a user
   I'd like to be able to search for the question
-}, sphinx: true do
+}, sphinx: true, js: true do
 
   given!(:first_question) { create :question, title: 'First title', body: 'One body' }
   given!(:second_question) { create :question, title: 'Second title', body: 'Two body' }
 
   before { visit search_path }
 
-  scenario 'User searches the question by title' do
-    ThinkingSphinx::Test.run do
-      expect(page).not_to have_content 'Results'
-      expect(page).not_to have_content first_question.title
-      expect(page).not_to have_content second_question.title
+  context 'User select question search checkbox' do
+    before { check 'question' }
 
-      fill_in 'Query', with: 'first'
-      click_on 'Search'
+    scenario 'and searches the question by title' do
+      ThinkingSphinx::Test.run do
+        expect(page).not_to have_content 'Results'
+        expect(page).not_to have_content first_question.title
+        expect(page).not_to have_content second_question.title
 
-      expect(page).to have_content 'Results'
-      expect(page).to have_content first_question.title
-      expect(page).not_to have_content second_question.title
+        fill_in 'Query', with: 'first'
+        click_on 'Search'
 
-      fill_in 'Query', with: 'second'
-      click_on 'Search'
+        expect(page).to have_content 'Results'
+        expect(page).to have_content first_question.title
+        expect(page).not_to have_content second_question.title
 
-      expect(page).to have_content 'Results'
-      expect(page).not_to have_content first_question.title
-      expect(page).to have_content second_question.title
+        fill_in 'Query', with: 'second'
+        click_on 'Search'
 
-      fill_in 'Query', with: 'title'
-      click_on 'Search'
+        expect(page).to have_content 'Results'
+        expect(page).not_to have_content first_question.title
+        expect(page).to have_content second_question.title
 
-      expect(page).to have_content 'Results'
-      expect(page).to have_content first_question.title
-      expect(page).to have_content second_question.title
+        fill_in 'Query', with: 'title'
+        click_on 'Search'
 
-      fill_in 'Query', with: 'something'
-      click_on 'Search'
+        expect(page).to have_content 'Results'
+        expect(page).to have_content first_question.title
+        expect(page).to have_content second_question.title
+      end
+    end
 
-      expect(page).not_to have_content 'Results'
-      expect(page).not_to have_content first_question.title
-      expect(page).not_to have_content second_question.title
-      expect(page).to have_content 'No questions found'
+    scenario 'and searches the question by body' do
+      ThinkingSphinx::Test.run do
+        expect(page).not_to have_content 'Results'
+        expect(page).not_to have_content first_question.body
+        expect(page).not_to have_content second_question.body
+
+        fill_in 'Query', with: 'one'
+        click_on 'Search'
+
+        expect(page).to have_content 'Results'
+        expect(page).to have_content first_question.body
+        expect(page).not_to have_content second_question.body
+
+        fill_in 'Query', with: 'two'
+        click_on 'Search'
+
+        expect(page).to have_content 'Results'
+        expect(page).not_to have_content first_question.body
+        expect(page).to have_content second_question.body
+
+        fill_in 'Query', with: 'body'
+        click_on 'Search'
+
+        expect(page).to have_content 'Results'
+        expect(page).to have_content first_question.body
+        expect(page).to have_content second_question.body
+
+        fill_in 'Query', with: 'something'
+        click_on 'Search'
+
+        expect(page).not_to have_content 'Results'
+        expect(page).not_to have_content first_question.body
+        expect(page).not_to have_content second_question.body
+        expect(page).to have_content 'No entries found'
+      end
+    end
+
+    context 'when there are any answers with coincident query' do
+      given!(:answer) { create :answer, body: 'Answer body' }
+
+      scenario 'and does not find answers' do
+        ThinkingSphinx::Test.run do
+          expect(page).not_to have_content answer.body
+
+          fill_in 'Query', with: 'body'
+          click_on 'Search'
+
+          expect(page).not_to have_content answer.body
+        end
+      end
     end
   end
 
-  scenario 'User searches the question by body' do
+  scenario 'User can not search questions without question checkbox selected' do
     ThinkingSphinx::Test.run do
-      expect(page).not_to have_content 'Results'
-      expect(page).not_to have_content first_question.title
-      expect(page).not_to have_content second_question.title
-
-      fill_in 'Query', with: 'one'
-      click_on 'Search'
-
-      expect(page).to have_content 'Results'
-      expect(page).to have_content first_question.title
-      expect(page).not_to have_content second_question.title
-
-      fill_in 'Query', with: 'two'
-      click_on 'Search'
-
-      expect(page).to have_content 'Results'
-      expect(page).not_to have_content first_question.title
-      expect(page).to have_content second_question.title
-
       fill_in 'Query', with: 'body'
       click_on 'Search'
 
-      expect(page).to have_content 'Results'
-      expect(page).to have_content first_question.title
-      expect(page).to have_content second_question.title
+      expect(page).to have_content 'You should choose type of results'
+      expect(page).not_to have_content first_question.body
+      expect(page).not_to have_content second_question.body
     end
   end
 end

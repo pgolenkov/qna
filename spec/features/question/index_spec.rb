@@ -13,4 +13,10 @@ feature 'User can view questions list', %q{
 
     questions.each { |question| expect(page).to have_content question.title }
   end
+
+  scenario 'User view bodies of questions on index page' do
+    visit questions_path
+
+    questions.each { |question| expect(page).to have_content question.body }
+  end
 end

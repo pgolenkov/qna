@@ -1,5 +1,9 @@
 class SearchesController < ApplicationController
   def show
-    @questions = params[:query].present? ? Question.search(params[:query]) : []
+    classes = params[:resources].to_a.compact.map(&:classify).map(&:constantize)
+
+    @records = if classes.present?
+      params[:query].present? ? ThinkingSphinx.search(params[:query], classes: classes) : []
+    end
   end
 end
