@@ -1,7 +1,7 @@
 = form_with url: search_path, method: :get, local: true do |f|
   = f.label :query
   = f.text_field :query
-  = render partial: "resources_checkboxes", locals: {f: f, resources: [:question, :answer, :comment] }
+  = render partial: "resources_checkboxes", locals: {f: f, resources: %w[question answer comment user] }
   = f.submit 'Search'
 
 - if params[:query].present?
