@@ -13,6 +13,7 @@ RSpec.describe SearchesController, type: :controller do
       allow(ThinkingSphinx).to receive(:search).with(query, classes: [Question]).and_return(questions)
       allow(ThinkingSphinx).to receive(:search).with(query, classes: [Comment]).and_return(comments)
       allow(ThinkingSphinx).to receive(:search).with(query, classes: [User]).and_return(users)
+      allow(ThinkingSphinx).to receive(:search).with(query, classes: [Question, Answer, Comment, User]).and_return(questions + answers + comments + users)
     end
 
     it 'should render show view' do
@@ -177,6 +178,33 @@ RSpec.describe SearchesController, type: :controller do
         it 'not initializes records instance var with users' do
           get :show, params: { query: 'something', resources: ['question'] }
           expect(assigns(:records).map(&:class)).not_to be_any(User)
+        end
+      end
+    end
+
+    context 'global search' do
+      context 'when query present and resources params includes all searchable classes' do
+
+        it 'calls search method of ThinkingSphinx with query and all searchable classes' do
+          expect(ThinkingSphinx).to receive(:search).with(query, classes: [Question, Answer, Comment, User])
+          get :show, params: { query: query, resources: ['question', 'answer', 'comment', 'user'] }
+        end
+
+        it 'initializes records instance var with results' do
+          get :show, params: { query: query, resources: ['question', 'answer', 'comment', 'user'] }
+          expect(assigns(:records)).to eq questions + answers + comments + users
+        end
+      end
+
+      context 'when query param is not present' do
+        it 'does not call search method of ThinkingSphinx' do
+          expect(ThinkingSphinx).not_to receive(:search)
+          get :show, params: { query: ' ', resources: ['question', 'answer', 'comment', 'user'] }
+        end
+
+        it 'initializes records instance var with empty array' do
+          get :show, params: { query: ' ', resources: ['question', 'answer', 'comment', 'user'] }
+          expect(assigns(:records)).to be_empty
         end
       end
     end
