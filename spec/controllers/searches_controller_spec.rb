@@ -2,222 +2,57 @@ require 'rails_helper'
 
 RSpec.describe SearchesController, type: :controller do
   describe 'GET #show' do
+    let(:service) { double 'Services::Search' }
     let(:query) { 'something' }
-    let(:questions) { build_list :question, 2 }
-    let(:answers) { build_list :answer, 2 }
-    let(:comments) { build_list :comment, 2 }
-    let(:users) { build_list :user, 2 }
+    let(:resources) { ['resource1', 'resource2'] }
+    let(:results) { double 'Results of search' }
 
     before do
-      allow(ThinkingSphinx).to receive(:search).with(query, classes: [Answer]).and_return(answers)
-      allow(ThinkingSphinx).to receive(:search).with(query, classes: [Question]).and_return(questions)
-      allow(ThinkingSphinx).to receive(:search).with(query, classes: [Comment]).and_return(comments)
-      allow(ThinkingSphinx).to receive(:search).with(query, classes: [User]).and_return(users)
-      allow(ThinkingSphinx).to receive(:search).with(query, classes: [Question, Answer, Comment, User]).and_return(questions + answers + comments + users)
+      allow(Services::Search).to receive(:new).and_return(service)
+      allow(service).to receive(:call).and_return(results)
     end
 
-    it 'should render show view' do
-      get :show
-      expect(response).to render_template :show
-    end
-
-    context 'questions only search' do
-      context 'when query present and resources params includes question' do
-
-        it 'calls search method of ThinkingSphinx with query and classes Question' do
-          expect(ThinkingSphinx).to receive(:search).with(query, classes: [Question])
-          get :show, params: { query: query, resources: ['question'] }
-        end
-
-        it 'initializes records instance var with results' do
-          allow(ThinkingSphinx).to receive(:search).with(query, classes: [Question]).and_return(questions)
-          get :show, params: { query: query, resources: ['question'] }
-          expect(assigns(:records)).to eq questions
-        end
+    context 'when no query param' do
+      it 'should render show view' do
+        get :show
+        expect(response).to render_template :show
       end
 
-      context 'when query param is not present' do
-        it 'does not call search method of ThinkingSphinx' do
-          expect(ThinkingSphinx).not_to receive(:search)
-          get :show, params: { query: ' ', resources: ['question'] }
-        end
-
-        it 'initializes records instance var with empty array' do
-          get :show, params: { query: ' ', resources: ['question'] }
-          expect(assigns(:records)).to be_empty
-        end
-      end
-
-      context 'when resources param does not include question' do
-        it 'does not call search method of ThinkingSphinx with classes Question' do
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [Question])
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [Question, Answer])
-          get :show, params: { query: 'something', resources: ['answer'] }
-        end
-
-        it 'not initializes records instance var with questions' do
-          get :show, params: { query: 'something', resources: ['answer'] }
-          expect(assigns(:records).map(&:class)).not_to be_any(Question)
-        end
+      it 'does not initializes and call Search service' do
+        expect(Services::Search).not_to receive(:new)
+        expect(service).not_to receive(:call)
+        get :show
       end
     end
 
-    context 'answers only search' do
-      context 'when query present and resources params includes answer' do
-
-        it 'calls search method of ThinkingSphinx with query and classes Answer' do
-          expect(ThinkingSphinx).to receive(:search).with(query, classes: [Answer])
-          get :show, params: { query: query, resources: ['answer'] }
-        end
-
-        it 'initializes records instance var with results' do
-          get :show, params: { query: query, resources: ['answer'] }
-          expect(assigns(:records)).to eq answers
-        end
+    context 'when no resources param' do
+      it 'should render show view' do
+        get :show, params: { query: query }
+        expect(response).to render_template :show
       end
 
-      context 'when query param is not present' do
-        it 'does not call search method of ThinkingSphinx' do
-          expect(ThinkingSphinx).not_to receive(:search)
-          get :show, params: { query: ' ', resources: ['answer'] }
-        end
-
-        it 'initializes records instance var with empty array' do
-          get :show, params: { query: ' ', resources: ['answer'] }
-          expect(assigns(:records)).to be_empty
-        end
-      end
-
-      context 'when resources param does not include answer' do
-        it 'does not call search method of ThinkingSphinx with classes Answer' do
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [Answer])
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [Question, Answer])
-          get :show, params: { query: 'something', resources: ['question'] }
-        end
-
-        it 'not initializes records instance var with answers' do
-          get :show, params: { query: 'something', resources: ['question'] }
-          expect(assigns(:records).map(&:class)).not_to be_any(Answer)
-        end
+      it 'does not initializes and call Search service' do
+        expect(Services::Search).not_to receive(:new)
+        expect(service).not_to receive(:call)
+        get :show, params: { query: query }
       end
     end
 
-    context 'comments only search' do
-      context 'when query present and resources params includes comment' do
-
-        it 'calls search method of ThinkingSphinx with query and classes Comment' do
-          expect(ThinkingSphinx).to receive(:search).with(query, classes: [Comment])
-          get :show, params: { query: query, resources: ['comment'] }
-        end
-
-        it 'initializes records instance var with results' do
-          get :show, params: { query: query, resources: ['comment'] }
-          expect(assigns(:records)).to eq comments
-        end
+    context 'when params present' do
+      it 'should render show view' do
+        get :show, params: { query: query, resources: resources }
+        expect(response).to render_template :show
       end
 
-      context 'when query param is not present' do
-        it 'does not call search method of ThinkingSphinx' do
-          expect(ThinkingSphinx).not_to receive(:search)
-          get :show, params: { query: ' ', resources: ['comment'] }
-        end
-
-        it 'initializes records instance var with empty array' do
-          get :show, params: { query: ' ', resources: ['comment'] }
-          expect(assigns(:records)).to be_empty
-        end
+      it 'sends query and resources params to Search service and calls it' do
+        expect(Services::Search).to receive(:new).with(query, resources).and_return(service)
+        expect(service).to receive(:call)
+        get :show, params: { query: query, resources: resources }
       end
 
-      context 'when resources param does not include comment' do
-        it 'does not call search method of ThinkingSphinx with classes Comment' do
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [Comment])
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [Question, Comment])
-          get :show, params: { query: 'something', resources: ['question'] }
-        end
-
-        it 'not initializes records instance var with comments' do
-          get :show, params: { query: 'something', resources: ['question'] }
-          expect(assigns(:records).map(&:class)).not_to be_any(Comment)
-        end
-      end
-    end
-
-    context 'users only search' do
-      context 'when query present and resources params includes user' do
-
-        it 'calls search method of ThinkingSphinx with query and classes User' do
-          expect(ThinkingSphinx).to receive(:search).with(query, classes: [User])
-          get :show, params: { query: query, resources: ['user'] }
-        end
-
-        it 'initializes records instance var with results' do
-          get :show, params: { query: query, resources: ['user'] }
-          expect(assigns(:records)).to eq users
-        end
-      end
-
-      context 'when query param is not present' do
-        it 'does not call search method of ThinkingSphinx' do
-          expect(ThinkingSphinx).not_to receive(:search)
-          get :show, params: { query: ' ', resources: ['user'] }
-        end
-
-        it 'initializes records instance var with empty array' do
-          get :show, params: { query: ' ', resources: ['user'] }
-          expect(assigns(:records)).to be_empty
-        end
-      end
-
-      context 'when resources param does not include user' do
-        it 'does not call search method of ThinkingSphinx with classes User' do
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [User])
-          expect(ThinkingSphinx).not_to receive(:search).with(query, classes: [Question, User])
-          get :show, params: { query: 'something', resources: ['question'] }
-        end
-
-        it 'not initializes records instance var with users' do
-          get :show, params: { query: 'something', resources: ['question'] }
-          expect(assigns(:records).map(&:class)).not_to be_any(User)
-        end
-      end
-    end
-
-    context 'global search' do
-      context 'when query present and resources params includes all searchable classes' do
-
-        it 'calls search method of ThinkingSphinx with query and all searchable classes' do
-          expect(ThinkingSphinx).to receive(:search).with(query, classes: [Question, Answer, Comment, User])
-          get :show, params: { query: query, resources: ['question', 'answer', 'comment', 'user'] }
-        end
-
-        it 'initializes records instance var with results' do
-          get :show, params: { query: query, resources: ['question', 'answer', 'comment', 'user'] }
-          expect(assigns(:records)).to eq questions + answers + comments + users
-        end
-      end
-
-      context 'when query param is not present' do
-        it 'does not call search method of ThinkingSphinx' do
-          expect(ThinkingSphinx).not_to receive(:search)
-          get :show, params: { query: ' ', resources: ['question', 'answer', 'comment', 'user'] }
-        end
-
-        it 'initializes records instance var with empty array' do
-          get :show, params: { query: ' ', resources: ['question', 'answer', 'comment', 'user'] }
-          expect(assigns(:records)).to be_empty
-        end
-      end
-    end
-
-    context 'when resources param does not present' do
-      it 'does not call search method of ThinkingSphinx' do
-        expect(ThinkingSphinx).not_to receive(:search)
-        get :show, params: { query: 'something' }
-      end
-
-      it 'not initializes records instance var' do
-        get :show, params: { query: 'something' }
-        expect(assigns(:records)).to be_nil
+      it 'initializes records instance var with results' do
+        get :show, params: { query: query, resources: resources }
+        expect(assigns(:records)).to eq results
       end
     end
   end

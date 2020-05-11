@@ -1,10 +1,7 @@
 class SearchesController < ApplicationController
   def show
-    classes = params[:resources].to_a.compact.map(&:classify).map(&:constantize)
-    query = ThinkingSphinx::Query.escape(params[:query] || '')
+    return if params[:query].blank? || params[:resources].blank?
 
-    @records = if classes.present?
-      query.present? ? ThinkingSphinx.search(query, classes: classes) : []
-    end
+    @records = Services::Search.new(params[:query], params[:resources]).call
   end
 end
