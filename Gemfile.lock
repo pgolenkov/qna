@@ -94,6 +94,9 @@ GEM
     capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
+    capistrano-sidekiq (1.0.2)
+      capistrano (>= 3.9.0)
+      sidekiq (>= 3.4)
     capybara (3.31.0)
       addressable
       mini_mime (>= 0.1.3)
@@ -229,7 +232,7 @@ GEM
     pg (1.1.4)
     public_suffix (4.0.3)
     puma (3.12.4)
-    rack (2.2.2)
+    rack (2.0.9)
     rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
@@ -266,7 +269,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
-    redis (4.1.3)
+    redis (4.1.4)
     regexp_parser (1.7.0)
     request_store (1.5.0)
       rack (>= 1.4)
@@ -310,11 +313,11 @@ GEM
       rubyzip (>= 1.2.2)
     shoulda-matchers (4.1.0)
       activesupport (>= 4.2.0)
-    sidekiq (6.0.7)
-      connection_pool (>= 2.2.2)
-      rack (~> 2.0)
-      rack-protection (>= 2.0.0)
-      redis (>= 4.1.0)
+    sidekiq (5.2.8)
+      connection_pool (~> 2.2, >= 2.2.2)
+      rack (< 2.1.0)
+      rack-protection (>= 1.5.0)
+      redis (>= 3.3.5, < 5)
     sinatra (2.0.8.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -401,6 +404,7 @@ DEPENDENCIES
   capistrano-passenger
   capistrano-rails (~> 1.3)
   capistrano-rvm
+  capistrano-sidekiq
   capybara (>= 2.15)
   capybara-email
   cocoon
@@ -430,7 +434,7 @@ DEPENDENCIES
   rspec-rails (~> 3.8)
   sass-rails (~> 5.0)
   shoulda-matchers
-  sidekiq
+  sidekiq (~> 5.2)
   sinatra
   skim
   slim-rails
