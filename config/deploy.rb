@@ -18,3 +18,5 @@ append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/syst
 set :sidekiq_options_per_process, [
   "--queue default --queue mailers"
 ]
+
+after 'deploy:publishing', 'unicorn:restart'
