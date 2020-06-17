@@ -1,37 +1,38 @@
-div id="answer-#{answer.id}"
-  = answer.body
-  .answer-links
-    = render answer.links
+- cache answer_cache_key(answer) do
+  div id="answer-#{answer.id}"
+    = answer.body
+    .answer-links
+      = render answer.links
 
-  - if answer.files.attached?
-    = render partial: 'attachments/attachment', collection: answer.files
+    - if answer.files.attached?
+      = render partial: 'attachments/attachment', collection: answer.files
 
-  div id="votable-answer-#{answer.id}"
-    = render 'votes/rating', votable: answer
-    - if signed_in? && can?(:create_vote, answer)
-      = render 'votes/vote', vote: answer.vote_of(current_user), votable: answer
+    div id="votable-answer-#{answer.id}"
+      = render 'votes/rating', votable: answer
+      - if signed_in? && can?(:create_vote, answer)
+        = render 'votes/vote', vote: answer.vote_of(current_user), votable: answer
 
-  .best-answer
-    = 'The best answer' if answer.best?
+    .best-answer
+      = 'The best answer' if answer.best?
 
-  .make-best-answer
-    - if !answer.best? && can?(:make_best, answer)
-      = link_to 'Mark as the best', make_best_answer_path(answer), method: :patch, remote: true
+    .make-best-answer
+      - if !answer.best? && can?(:make_best, answer)
+        = link_to 'Mark as the best', make_best_answer_path(answer), method: :patch, remote: true
 
-  - if can?(:update, answer)
-    = link_to 'Edit answer', '#', class: 'edit-answer-link', data: { answer_id: answer.id }
-  - if can?(:destroy, answer)
-    = link_to 'Delete answer', answer, method: :delete, remote: true
+    - if can?(:update, answer)
+      = link_to 'Edit answer', '#', class: 'edit-answer-link', data: { answer_id: answer.id }
+    - if can?(:destroy, answer)
+      = link_to 'Delete answer', answer, method: :delete, remote: true
 
-    .update-answer-errors
-      = render 'shared/errors', resource: answer
+      .update-answer-errors
+        = render 'shared/errors', resource: answer
 
-    = form_with model: answer, class: 'hidden' do |f|
-      = f.label :body
-      = f.text_area :body
-      = f.label :files
-      = f.file_field :files, multiple: true, direct_upload: true
-      = render 'links/links_form', f: f
-      = f.submit 'Save'
+      = form_with model: answer, class: 'hidden' do |f|
+        = f.label :body
+        = f.text_area :body
+        = f.label :files
+        = f.file_field :files, multiple: true, direct_upload: true
+        = render 'links/links_form', f: f
+        = f.submit 'Save'
 
-  = render "comments/comments", commentable: answer
+    = render "comments/comments", commentable: answer
