@@ -1,4 +1,4 @@
-- cache [current_user, question] do
+- cache [signed_in?, can?(:create_vote, question), can?(:update, question), can?(:destroy, question), question] do
   .question
     = render 'question_full'
 
