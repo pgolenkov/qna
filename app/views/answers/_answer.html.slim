@@ -1,4 +1,4 @@
-- cache [signed_in?, can?(:make_best, answer), can?(:create_vote, answer), can?(:update, answer), can?(:destroy, answer), answer] do
+- cache answer_cache_key(answer) do
   div id="answer-#{answer.id}"
     = answer.body
     .answer-links
