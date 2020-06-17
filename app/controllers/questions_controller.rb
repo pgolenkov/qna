@@ -2,7 +2,8 @@ class QuestionsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
 
   expose :questions, ->{ Question.all }
-  expose :question, scope: :with_attached_files, build: ->(params, scope){ current_user.questions.build(params) }
+  expose :question, scope: :with_attached_files,
+    build: ->(params, scope){ current_user.questions.build(params) }
 
   def show
     authorize! :show, question
