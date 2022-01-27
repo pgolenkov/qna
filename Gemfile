@@ -55,7 +55,7 @@ gem "httparty"
 gem 'active_storage_validations'
 gem 'active_model_serializers', '~> 0.10'
 gem 'oj'
-gem 'sidekiq', '~> 5.2'
+gem 'sidekiq', '~> 6.4'
 gem 'sinatra', require: false
 gem 'whenever', require: false
 gem 'mysql2'
